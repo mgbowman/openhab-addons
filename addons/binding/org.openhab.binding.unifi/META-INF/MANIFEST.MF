@@ -1,0 +1,28 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: UniFi Binding
+Bundle-SymbolicName: org.openhab.binding.unifi;singleton:=true
+Bundle-Vendor: openHAB
+Bundle-Version: 2.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ClassPath: .
+Import-Package: 
+ com.fasterxml.jackson.annotation;version="2.4.5",
+ com.fasterxml.jackson.core;version="2.4.5",
+ com.fasterxml.jackson.databind;version="2.4.5",
+ com.google.common.collect;version="10.0.1",
+ org.apache.commons.io;version="2.2.0",
+ org.apache.commons.lang;version="2.6.0",
+ org.eclipse.smarthome.config.core,
+ org.eclipse.smarthome.core.library.types,
+ org.eclipse.smarthome.core.thing,
+ org.eclipse.smarthome.core.thing.binding,
+ org.eclipse.smarthome.core.thing.binding.builder,
+ org.eclipse.smarthome.core.thing.type,
+ org.eclipse.smarthome.core.types,
+ org.openhab.binding.unifi,
+ org.openhab.binding.unifi.handler,
+ org.slf4j
+Service-Component: OSGI-INF/*.xml
+Export-Package: org.openhab.binding.unifi,
+ org.openhab.binding.unifi.handler
