@@ -30,7 +30,6 @@ import org.openhab.binding.unifi.UniFiBindingConstants;
 import org.openhab.binding.unifi.internal.UniFiController;
 import org.openhab.binding.unifi.internal.UniFiControllerConfig;
 import org.openhab.binding.unifi.internal.UniFiException;
-import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,8 +68,6 @@ public class UniFiControllerHandler extends BaseBridgeHandler implements Runnabl
 
     @Override
     public void initialize() {
-        Version version = bundleContext.getBundle().getVersion();
-        logger.info("UniFi Binding v{}", version);
 
         // mgb: called when the config changes
 
