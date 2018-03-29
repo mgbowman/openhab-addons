@@ -13,8 +13,9 @@ import static org.eclipse.smarthome.core.thing.ThingStatusDetail.BRIDGE_OFFLINE;
 import static org.eclipse.smarthome.core.types.RefreshType.REFRESH;
 import static org.openhab.binding.unifi.UniFiBindingConstants.*;
 
-import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.smarthome.core.library.types.DateTimeType;
@@ -48,8 +49,8 @@ import org.slf4j.LoggerFactory;
  */
 public class UniFiClientHandler extends BaseThingHandler {
 
-    public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections
-            .singleton(UniFiBindingConstants.THING_TYPE_CLIENT);
+    public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Stream
+            .of(UniFiBindingConstants.THING_TYPE_CLIENT).collect(Collectors.toSet());
 
     private Logger logger = LoggerFactory.getLogger(UniFiClientHandler.class);
 

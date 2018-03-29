@@ -11,10 +11,11 @@ package org.openhab.binding.unifi.handler;
 import static org.eclipse.smarthome.core.thing.ThingStatus.*;
 import static org.eclipse.smarthome.core.thing.ThingStatusDetail.COMMUNICATION_ERROR;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
@@ -41,8 +42,8 @@ import org.slf4j.LoggerFactory;
  */
 public class UniFiControllerHandler extends BaseBridgeHandler implements Runnable {
 
-    public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections
-            .singleton(UniFiBindingConstants.THING_TYPE_CONTROLLER);
+    public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Stream
+            .of(UniFiBindingConstants.THING_TYPE_CONTROLLER).collect(Collectors.toSet());
 
     private Logger logger = LoggerFactory.getLogger(UniFiControllerHandler.class);
 

@@ -9,6 +9,8 @@
 package org.openhab.binding.unifi.internal;
 
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.Thing;
@@ -18,8 +20,6 @@ import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.openhab.binding.unifi.handler.UniFiClientHandler;
 import org.openhab.binding.unifi.handler.UniFiControllerHandler;
 
-import com.google.common.collect.Sets;
-
 /**
  * The {@link UniFiHandlerFactory} is responsible for creating things and thing
  * handlers.
@@ -28,8 +28,10 @@ import com.google.common.collect.Sets;
  */
 public class UniFiHandlerFactory extends BaseThingHandlerFactory {
 
-    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Sets
-            .union(UniFiControllerHandler.SUPPORTED_THING_TYPES_UIDS, UniFiClientHandler.SUPPORTED_THING_TYPES_UIDS);
+    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Stream
+            .concat(UniFiControllerHandler.SUPPORTED_THING_TYPES_UIDS.stream(),
+                    UniFiClientHandler.SUPPORTED_THING_TYPES_UIDS.stream())
+            .collect(Collectors.toSet());
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
