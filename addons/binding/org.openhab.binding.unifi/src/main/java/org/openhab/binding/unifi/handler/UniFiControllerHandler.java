@@ -64,7 +64,7 @@ public class UniFiControllerHandler extends BaseBridgeHandler implements Runnabl
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         // nop - read-only binding
-        logger.info("Ignoring command = {} for channel = {} - the UniFi binding is read-only!", command, channelUID);
+        logger.debug("Ignoring command = {} for channel = {} - the UniFi binding is read-only!", command, channelUID);
     }
 
     @Override
