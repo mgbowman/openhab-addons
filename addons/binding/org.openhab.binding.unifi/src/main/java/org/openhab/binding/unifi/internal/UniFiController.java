@@ -194,7 +194,7 @@ public class UniFiController {
     public boolean login() {
         boolean success = false;
         // login
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("username", config.getUsername());
         params.put("password", config.getPassword());
         try {
@@ -212,7 +212,7 @@ public class UniFiController {
 
     private Map<String, UniFiSite> getSites() throws UniFiException {
         UniFiSiteResponse response = get(getSitesUrl(), UniFiSiteResponse.class);
-        Map<String, UniFiSite> siteMap = new HashMap<String, UniFiSite>();
+        Map<String, UniFiSite> siteMap = new HashMap<>();
         List<UniFiSite> sites = response.getData();
         logger.debug("Found {} UniFi Site(s):", sites.size());
         for (UniFiSite site : sites) {
@@ -224,7 +224,7 @@ public class UniFiController {
 
     private Map<String, UniFiDevice> getDevices(UniFiSite site) throws UniFiException {
         UniFiDeviceResponse response = get(getDevicesUrl(site), UniFiDeviceResponse.class);
-        Map<String, UniFiDevice> deviceMap = new HashMap<String, UniFiDevice>();
+        Map<String, UniFiDevice> deviceMap = new HashMap<>();
         List<UniFiDevice> devices = response.getData();
         logger.debug("Found {} UniFi Device(s):", devices.size());
         for (UniFiDevice device : devices) {
@@ -236,7 +236,7 @@ public class UniFiController {
     }
 
     private Map<String, UniFiDevice> getDevices() throws UniFiException {
-        Map<String, UniFiDevice> deviceMap = new HashMap<String, UniFiDevice>();
+        Map<String, UniFiDevice> deviceMap = new HashMap<>();
         Collection<UniFiSite> sites = sitesCache.values();
         for (UniFiSite site : sites) {
             Map<String, UniFiDevice> devices = getDevices(site);
@@ -247,7 +247,7 @@ public class UniFiController {
 
     private Map<String, UniFiClient> getClients(UniFiSite site) throws UniFiException {
         UniFiClientResponse response = get(getClientsUrl(site), UniFiClientResponse.class);
-        Map<String, UniFiClient> clientMap = new HashMap<String, UniFiClient>();
+        Map<String, UniFiClient> clientMap = new HashMap<>();
         List<UniFiClient> clients = response.getData();
         logger.debug("Found {} UniFi Client(s):", clients.size());
         for (UniFiClient client : clients) {
@@ -262,7 +262,7 @@ public class UniFiController {
         Map<String, UniFiClient> clientMap = Collections.emptyMap();
         Collection<UniFiSite> sites = sitesCache.values();
         if (!sites.isEmpty()) {
-            clientMap = new HashMap<String, UniFiClient>();
+            clientMap = new HashMap<>();
             for (UniFiSite site : sites) {
                 Map<String, UniFiClient> siteClientMap = getClients(site);
                 if (siteClientMap != null) {
@@ -275,7 +275,7 @@ public class UniFiController {
 
     private Map<String, UniFiClient> getInsights(UniFiSite site) throws UniFiException {
         UniFiClientResponse response = get(getInsightsUrl(site), INSIGHTS_WITHIN_24H, UniFiClientResponse.class);
-        Map<String, UniFiClient> insightsMap = new HashMap<String, UniFiClient>();
+        Map<String, UniFiClient> insightsMap = new HashMap<>();
         List<UniFiClient> clients = response.getData();
         logger.debug("Found {} UniFi Insights(s):", clients.size());
         for (UniFiClient client : clients) {
@@ -289,7 +289,7 @@ public class UniFiController {
         Map<String, UniFiClient> insightsMap = Collections.emptyMap();
         Collection<UniFiSite> sites = sitesCache.values();
         if (!sites.isEmpty()) {
-            insightsMap = new HashMap<String, UniFiClient>();
+            insightsMap = new HashMap<>();
             for (UniFiSite site : sites) {
                 Map<String, UniFiClient> siteInsightsMap = getInsights(site);
                 if (siteInsightsMap != null) {
