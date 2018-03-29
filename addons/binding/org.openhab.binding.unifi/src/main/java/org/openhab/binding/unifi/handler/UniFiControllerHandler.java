@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Matthew Bowman - Initial contribution
  */
-public class UniFiControllerHandler extends BaseBridgeHandler implements Runnable {
+public class UniFiControllerHandler extends BaseBridgeHandler {
 
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Stream
             .of(UniFiBindingConstants.THING_TYPE_CONTROLLER).collect(Collectors.toSet());
@@ -96,7 +96,7 @@ public class UniFiControllerHandler extends BaseBridgeHandler implements Runnabl
 
     private void scheduleRefreshJob() {
         logger.debug("Scheduling refresh job every {}s", config.getRefresh());
-        refreshJob = scheduler.scheduleWithFixedDelay(this, 0, config.getRefresh(), TimeUnit.SECONDS);
+        refreshJob = scheduler.scheduleWithFixedDelay(this::run, 0, config.getRefresh(), TimeUnit.SECONDS);
     }
 
     private void cancelRefreshJob() {
@@ -157,8 +157,7 @@ public class UniFiControllerHandler extends BaseBridgeHandler implements Runnabl
         }
     }
 
-    @Override
-    public void run() {
+    private void run() {
         try {
             logger.trace("Executing refresh job");
             refresh();
