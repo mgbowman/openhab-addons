@@ -45,7 +45,7 @@ public class UniFiControllerHandler extends BaseBridgeHandler implements Runnabl
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Stream
             .of(UniFiBindingConstants.THING_TYPE_CONTROLLER).collect(Collectors.toSet());
 
-    private Logger logger = LoggerFactory.getLogger(UniFiControllerHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(UniFiControllerHandler.class);
 
     private UniFiControllerConfig config;
 

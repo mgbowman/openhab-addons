@@ -52,7 +52,7 @@ public class UniFiClientHandler extends BaseThingHandler {
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Stream
             .of(UniFiBindingConstants.THING_TYPE_CLIENT).collect(Collectors.toSet());
 
-    private Logger logger = LoggerFactory.getLogger(UniFiClientHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(UniFiClientHandler.class);
 
     private volatile UniFiClientConfig config; /* mgb: volatile because accessed from multiple threads */
 

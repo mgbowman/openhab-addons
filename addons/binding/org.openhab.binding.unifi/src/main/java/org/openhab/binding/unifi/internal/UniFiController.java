@@ -60,7 +60,7 @@ public class UniFiController {
 
     private static final Map<String, String> INSIGHTS_WITHIN_24H = Collections.singletonMap("within", "24");
 
-    private Logger logger = LoggerFactory.getLogger(UniFiController.class);
+    private final Logger logger = LoggerFactory.getLogger(UniFiController.class);
 
     private UniFiControllerConfig config;
 
