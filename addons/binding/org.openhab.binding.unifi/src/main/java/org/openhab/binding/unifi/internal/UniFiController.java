@@ -16,6 +16,8 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Calendar;
 import java.util.Collection;
@@ -84,7 +86,7 @@ public class UniFiController {
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, new TrustManager[] { new UniFiTrustManager() }, new SecureRandom());
             sslSocketFactory = sc.getSocketFactory();
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
             throw new UniFiException("Could not install SSL trust-all manager", e);
         }
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
