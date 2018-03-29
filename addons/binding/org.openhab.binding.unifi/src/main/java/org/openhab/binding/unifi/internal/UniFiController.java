@@ -99,8 +99,34 @@ public class UniFiController {
         this.config = config;
     }
 
-    public UniFiControllerConfig getConfig() {
-        return config;
+    // Private API Functions
+
+    private String getBaseUrl() {
+        return "https://" + config.getHost() + ":" + config.getPort() + "/";
+    }
+
+    private String getLoginUrl() {
+        return getBaseUrl() + "api/login";
+    }
+
+    private String getLogoutUrl() {
+        return getBaseUrl() + "logout";
+    }
+
+    private String getSitesUrl() {
+        return getBaseUrl() + "api/self/sites";
+    }
+
+    private String getDevicesUrl(UniFiSite site) {
+        return getBaseUrl() + "api/s/" + site.getPath() + "/stat/device";
+    }
+
+    private String getClientsUrl(UniFiSite site) {
+        return getBaseUrl() + "api/s/" + site.getPath() + "/stat/sta";
+    }
+
+    private String getInsightsUrl(UniFiSite site) {
+        return getBaseUrl() + "api/s/" + site.getPath() + "/stat/alluser";
     }
 
     private HttpsURLConnection openConnection(String uri) throws IOException, URISyntaxException {
@@ -188,25 +214,6 @@ public class UniFiController {
 
     private <T> T get(String url, Class<T> responseType) throws UniFiException {
         return get(url, null, responseType);
-    }
-
-    public boolean login() {
-        boolean success = false;
-        // login
-        Map<String, String> params = new HashMap<>();
-        params.put("username", config.getUsername());
-        params.put("password", config.getPassword());
-        try {
-            String response = get(getLoginUrl(), params);
-            success = (response != null);
-        } catch (SocketException | SocketTimeoutException e) {
-            logger.warn("Could not connect to the UniFi Controller");
-            success = false;
-        } catch (Exception e) {
-            logger.error("Error trying to authenticate to UniFi Controller", e);
-            success = false;
-        }
-        return success;
     }
 
     private Map<String, UniFiSite> getSites() throws UniFiException {
@@ -362,42 +369,31 @@ public class UniFiController {
         return online;
     }
 
+    public boolean login() {
+        boolean success = false;
+        // login
+        Map<String, String> params = new HashMap<>();
+        params.put("username", config.getUsername());
+        params.put("password", config.getPassword());
+        try {
+            String response = get(getLoginUrl(), params);
+            success = (response != null);
+        } catch (SocketException | SocketTimeoutException e) {
+            logger.warn("Could not connect to the UniFi Controller");
+            success = false;
+        } catch (Exception e) {
+            logger.error("Error trying to authenticate to UniFi Controller", e);
+            success = false;
+        }
+        return success;
+    }
+
     public void logout() {
         try {
             get(getLogoutUrl());
         } catch (Exception e) {
             // nop
         }
-    }
-
-    // Private URL Helper Functions
-
-    private String getBaseUrl() {
-        return "https://" + config.getHost() + ":" + config.getPort() + "/";
-    }
-
-    private String getLoginUrl() {
-        return getBaseUrl() + "api/login";
-    }
-
-    private String getLogoutUrl() {
-        return getBaseUrl() + "logout";
-    }
-
-    private String getSitesUrl() {
-        return getBaseUrl() + "api/self/sites";
-    }
-
-    private String getDevicesUrl(UniFiSite site) {
-        return getBaseUrl() + "api/s/" + site.getPath() + "/stat/device";
-    }
-
-    private String getClientsUrl(UniFiSite site) {
-        return getBaseUrl() + "api/s/" + site.getPath() + "/stat/sta";
-    }
-
-    private String getInsightsUrl(UniFiSite site) {
-        return getBaseUrl() + "api/s/" + site.getPath() + "/stat/alluser";
     }
 
 }
