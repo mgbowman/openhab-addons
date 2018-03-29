@@ -17,8 +17,11 @@ import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
+import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
 import org.openhab.binding.unifi.handler.UniFiClientHandler;
 import org.openhab.binding.unifi.handler.UniFiControllerHandler;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 /**
  * The {@link UniFiHandlerFactory} is responsible for creating things and thing
@@ -26,6 +29,7 @@ import org.openhab.binding.unifi.handler.UniFiControllerHandler;
  *
  * @author Matthew Bowman - Initial contribution
  */
+@Component(service = ThingHandlerFactory.class, immediate = true, configurationPid = "binding.unifi", configurationPolicy = ConfigurationPolicy.OPTIONAL)
 public class UniFiHandlerFactory extends BaseThingHandlerFactory {
 
     private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Stream
