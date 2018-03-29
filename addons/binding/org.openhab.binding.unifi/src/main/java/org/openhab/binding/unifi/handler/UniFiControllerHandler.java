@@ -98,8 +98,8 @@ public class UniFiControllerHandler extends BaseBridgeHandler implements Runnabl
     }
 
     private void scheduleRefreshJob() {
-        logger.debug("Scheduling refresh job every {}s", config.getRefresh().longValue());
-        refreshJob = scheduler.scheduleWithFixedDelay(this, 0, config.getRefresh().longValue(), TimeUnit.SECONDS);
+        logger.debug("Scheduling refresh job every {}s", config.getRefresh());
+        refreshJob = scheduler.scheduleWithFixedDelay(this, 0, config.getRefresh(), TimeUnit.SECONDS);
     }
 
     private void cancelRefreshJob() {

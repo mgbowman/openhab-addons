@@ -92,8 +92,9 @@ public class UniFiController {
 
         if (!config.isValid()) {
             throw new UniFiException("Invalid configuration");
-        } else if (config.getConsiderHome().compareTo(config.getRefresh()) <= 0) {
-            throw new UniFiException("Invalid configuration: consider home interval must be > refresh interval");
+        } else if (config.getConsiderHome() <= config.getRefresh()) {
+            throw new UniFiException(
+                    "Invalid configuration: consider home interval must be larger than refresh interval");
         }
 
         this.config = config;
@@ -354,7 +355,7 @@ public class UniFiController {
                 logger.warn("Could not determine if client is online: mac = {}, lastSeen = null", client.getMac());
             } else {
                 Calendar considerHome = (Calendar) lastSeen.clone();
-                considerHome.add(Calendar.SECOND, config.getConsiderHome().intValue());
+                considerHome.add(Calendar.SECOND, config.getConsiderHome());
                 Calendar now = Calendar.getInstance();
                 online = (now.compareTo(considerHome) < 0);
             }
@@ -373,7 +374,7 @@ public class UniFiController {
     // Private URL Helper Functions
 
     private String getBaseUrl() {
-        return "https://" + config.getHost() + ":" + config.getPort().intValue() + "/";
+        return "https://" + config.getHost() + ":" + config.getPort() + "/";
     }
 
     private String getLoginUrl() {

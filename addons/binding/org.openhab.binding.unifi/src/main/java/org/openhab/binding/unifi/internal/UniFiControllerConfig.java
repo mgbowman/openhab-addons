@@ -8,8 +8,6 @@
  */
 package org.openhab.binding.unifi.internal;
 
-import java.math.BigDecimal;
-
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -21,18 +19,18 @@ import org.apache.commons.lang.StringUtils;
  */
 public class UniFiControllerConfig {
 
-    private String host;
-    private BigDecimal port;
+    private String host = "unifi";
+    private int port = 8443;
     private String username;
     private String password;
-    private BigDecimal refresh;
-    private BigDecimal considerHome;
+    private int refresh = 10;
+    private int considerHome = 180;
 
     public String getHost() {
         return host;
     }
 
-    public BigDecimal getPort() {
+    public int getPort() {
         return port;
     }
 
@@ -44,17 +42,16 @@ public class UniFiControllerConfig {
         return password;
     }
 
-    public BigDecimal getRefresh() {
+    public int getRefresh() {
         return refresh;
     }
 
-    public BigDecimal getConsiderHome() {
+    public int getConsiderHome() {
         return considerHome;
     }
 
     public boolean isValid() {
-        return StringUtils.isNotBlank(host) && port != null && StringUtils.isNotBlank(username)
-                && StringUtils.isNotBlank(password) && refresh != null && considerHome != null;
+        return StringUtils.isNotBlank(host) && StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password);
     }
 
     @Override
