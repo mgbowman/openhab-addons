@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  * (better known as an Access Point).
  *
  * @author Matthew Bowman - Initial contribution
- *
  */
 public class UniFiDevice {
 

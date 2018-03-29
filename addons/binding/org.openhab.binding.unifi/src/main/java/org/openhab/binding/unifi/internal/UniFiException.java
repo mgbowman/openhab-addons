@@ -11,16 +11,12 @@ package org.openhab.binding.unifi.internal;
 import java.io.IOException;
 
 /**
- *
  * The {@link UniFiException} represents a binding specific {@link IOException}.
  *
  * @author Matthew Bowman - Initial contribution
  */
 public class UniFiException extends IOException {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = -7422254981644510570L;
 
     public UniFiException(String message) {

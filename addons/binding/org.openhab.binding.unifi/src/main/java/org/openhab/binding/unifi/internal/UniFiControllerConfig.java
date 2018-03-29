@@ -11,7 +11,6 @@ package org.openhab.binding.unifi.internal;
 import org.apache.commons.lang.StringUtils;
 
 /**
- *
  * The {@link UniFiControllerConfig} encapsulates all the configuration options for an instance of the
  * {@link UniFiController}.
  *

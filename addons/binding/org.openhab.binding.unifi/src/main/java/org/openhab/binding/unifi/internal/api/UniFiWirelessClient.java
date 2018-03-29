@@ -17,7 +17,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
- *
  * A {@link UniFiWirelessClient} represents a wireless {@link UniFiClient}.
  *
  * A wireless client is not physically connected to the network - typically it is connected via a Wi-Fi adapter.

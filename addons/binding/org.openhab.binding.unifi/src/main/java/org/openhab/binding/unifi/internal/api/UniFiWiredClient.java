@@ -11,7 +11,6 @@ package org.openhab.binding.unifi.internal.api;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- *
  * A {@link UniFiWiredClient} represents a wired {@link UniFiClient}.
  *
  * A wired client is physically connected to the network - typically it is connected via an Ethernet cable.

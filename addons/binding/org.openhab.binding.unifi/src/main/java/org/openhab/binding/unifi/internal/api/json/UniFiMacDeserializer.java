@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
- *
  * The {@link UniFiMacDeserializer} is an implementation of {@link JsonDeserialize} that deserializes network MAC
  * addresses returned in the JSON responses of the UniFi controller.
  *

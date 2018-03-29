@@ -16,7 +16,6 @@ import org.apache.commons.lang.StringUtils;
  * The {@link UniFiClientConfig} represents the
  *
  * @author Matthew Bowman - Initial contribution
- *
  */
 public class UniFiClientConfig {
 

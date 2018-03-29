@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
- *
  * The {@link UniFiTimestampDeserializer} is an implementation of {@link JsonDeserialize} that deserializes timestamps
  * returned in the JSON responses of the UniFi controller.
  *

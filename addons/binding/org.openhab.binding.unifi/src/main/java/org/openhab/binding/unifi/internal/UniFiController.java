@@ -50,7 +50,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- *
  * The {@link UniFiController} is the main communication point with an external instance of the Ubiquiti Networks
  * Controller Software.
  *

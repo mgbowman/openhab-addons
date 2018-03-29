@@ -9,7 +9,6 @@
 package org.openhab.binding.unifi.internal.api;
 
 /**
- *
  * A {@link UniFiUnknownClient} represents an unknown {@link UniFiClient}.
  *
  * An unknown client is neither a {@link UniFiWiredClient} nor a {@link UniFiWirelessClient}
