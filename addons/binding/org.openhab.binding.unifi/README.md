@@ -11,7 +11,7 @@ This binding integrates with [Ubiquiti UniFi Networks](https://www.ubnt.com/prod
 
 ## Discovery
 
-Discovery is not currently supported.
+Discovery is currently not supported.
 
 
 ## Binding Configuration
@@ -64,15 +64,15 @@ Normally Closed (NC) means the `Contact` is `CLOSED` when the client is absent; 
 
 The Wireless Client information that is retrieved is available as these channels:
 
-| Channel ID | Item Type    | Description              |
-|------------|--------------|------------------------- |
-| online<sup>1</sup> | Contact | Online status of the client |
-| ap | String | Access point (AP) the client is connected to |
-| essid | String | Network name (ESSID) the client is connected to |
-| rssi | Number | Received signal strength indicator (RSSI) of the client |
-| site | String | Site name (from the controller web UI) the client is associated with |
-| uptime | Number | Uptime of the wireless client (in seconds) |
-| lastSeen | DateTime | Date and Time the wireless client was last seen |
+| Channel ID         | Item Type | Description                                                          |
+|--------------------|-----------|--------------------------------------------------------------------- |
+| online<sup>1</sup> | Contact   | Online status of the client                                          |
+| ap                 | String    | Access point (AP) the client is connected to                         |
+| essid              | String    | Network name (ESSID) the client is connected to                      |
+| rssi               | Number    | Received signal strength indicator (RSSI) of the client              |
+| site               | String    | Site name (from the controller web UI) the client is associated with |
+| uptime             | Number    | Uptime of the wireless client (in seconds)                           |
+| lastSeen           | DateTime  | Date and Time the wireless client was last seen                      |
 
 <sup>1</sup> The `online` channel's normal (default) `Contact` state can be configured via the `contactType` parameter
 
