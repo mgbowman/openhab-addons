@@ -123,7 +123,6 @@ public class UniFiControllerHandler extends BaseBridgeHandler {
         String statusDescription = getThing().getStatusInfo().getDescription();
 
         if (controller == null) {
-            // mgb: this should never happen
             logger.warn("UniFi Controller is NULL - this should never happen!");
         } else {
             // mgb: we're offline, we need to try to login
