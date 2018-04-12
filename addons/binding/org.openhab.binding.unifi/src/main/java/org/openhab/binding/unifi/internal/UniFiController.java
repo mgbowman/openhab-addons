@@ -11,6 +11,7 @@ package org.openhab.binding.unifi.internal;
 import static java.net.HttpURLConnection.*;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.CookieManager;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -43,13 +44,17 @@ import org.openhab.binding.unifi.internal.api.UniFiWirelessClient;
 import org.openhab.binding.unifi.internal.api.json.UniFiClientResponse;
 import org.openhab.binding.unifi.internal.api.json.UniFiDeviceResponse;
 import org.openhab.binding.unifi.internal.api.json.UniFiSiteResponse;
+import org.openhab.binding.unifi.internal.api.json.adapters.UniFiClientDeserializer;
 import org.openhab.binding.unifi.internal.ssl.UniFiHostnameVerifier;
 import org.openhab.binding.unifi.internal.ssl.UniFiTrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * The {@link UniFiController} is the main communication point with an external instance of the Ubiquiti Networks
@@ -77,7 +82,7 @@ public class UniFiController {
 
     private Map<String, UniFiClient> insightsCache = Collections.emptyMap();
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private Gson gson;
 
     private CookieManager cookieManager = new CookieManager();
 
@@ -89,7 +94,9 @@ public class UniFiController {
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             throw new UniFiException("Could not install SSL trust-all manager", e);
         }
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+        this.gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .registerTypeAdapter(UniFiClient.class, new UniFiClientDeserializer()).create();
 
         if (!config.isValid()) {
             throw new UniFiException("Invalid configuration");
@@ -161,7 +168,9 @@ public class UniFiController {
         HttpsURLConnection connection = openConnection(url);
         if (params != null) {
             connection.setDoOutput(true);
-            objectMapper.writeValue(connection.getOutputStream(), params);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream());
+            gson.toJson(params, outputStreamWriter);
+            outputStreamWriter.close();
         }
         int rc = connection.getResponseCode();
         if (rc == HTTP_OK) {
@@ -200,10 +209,13 @@ public class UniFiController {
                 throw new UniFiException("Could not communicate with the UniFi Controller");
             } else {
                 if (logger.isTraceEnabled()) {
-                    logger.trace("JSON content from URL: {}\n{}", url, objectMapper.writerWithDefaultPrettyPrinter()
-                            .writeValueAsString(objectMapper.readValue(content, Object.class)));
+                    JsonParser parser = new JsonParser();
+                    JsonObject json = parser.parse(content).getAsJsonObject();
+                    Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
+                    String prettyJson = prettyGson.toJson(json);
+                    logger.trace("JSON content from URL: {}\n{}", url, prettyJson);
                 }
-                response = objectMapper.readValue(content, responseType);
+                response = gson.fromJson(content, responseType);
             }
         } catch (SocketException | SocketTimeoutException e) {
             throw new UniFiException("Could not communicate with the UniFi Controller");

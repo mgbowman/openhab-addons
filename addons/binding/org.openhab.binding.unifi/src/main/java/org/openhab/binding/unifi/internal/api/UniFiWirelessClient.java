@@ -10,11 +10,10 @@ package org.openhab.binding.unifi.internal.api;
 
 import java.util.Calendar;
 
-import org.openhab.binding.unifi.internal.api.json.UniFiMacDeserializer;
-import org.openhab.binding.unifi.internal.api.json.UniFiTimestampDeserializer;
+import org.openhab.binding.unifi.internal.api.json.adapters.UniFiTidyLowerCaseStringDeserializer;
+import org.openhab.binding.unifi.internal.api.json.adapters.UniFiTimestampDeserializer;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.gson.annotations.JsonAdapter;
 
 /**
  * A {@link UniFiWirelessClient} represents a wireless {@link UniFiClient}.
@@ -25,8 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  */
 public class UniFiWirelessClient extends UniFiClient {
 
-    @JsonProperty("ap_mac")
-    @JsonDeserialize(using = UniFiMacDeserializer.class)
+    @JsonAdapter(UniFiTidyLowerCaseStringDeserializer.class)
     private String apMac;
 
     private String essid;
@@ -35,8 +33,7 @@ public class UniFiWirelessClient extends UniFiClient {
 
     private Integer uptime;
 
-    @JsonProperty("last_seen")
-    @JsonDeserialize(using = UniFiTimestampDeserializer.class)
+    @JsonAdapter(UniFiTimestampDeserializer.class)
     private Calendar lastSeen;
 
     public Integer getRssi() {

@@ -8,8 +8,6 @@
  */
 package org.openhab.binding.unifi.internal.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * A {@link UniFiWiredClient} represents a wired {@link UniFiClient}.
  *
@@ -19,7 +17,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class UniFiWiredClient extends UniFiClient {
 
-    @JsonProperty("sw_mac")
     private String swMac;
 
     @Override

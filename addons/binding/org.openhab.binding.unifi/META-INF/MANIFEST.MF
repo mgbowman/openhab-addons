@@ -10,10 +10,8 @@ Bundle-Version: 2.3.0.qualifier
 Export-Package: org.openhab.binding.unifi,
  org.openhab.binding.unifi.handler
 Import-Package: 
- com.fasterxml.jackson.annotation,
- com.fasterxml.jackson.core,
- com.fasterxml.jackson.databind,
- com.fasterxml.jackson.databind.annotation,
+ com.google.gson,
+ com.google.gson.annotations,
  org.apache.commons.io,
  org.apache.commons.lang,
  org.eclipse.jdt.annotation;resolution:=optional,

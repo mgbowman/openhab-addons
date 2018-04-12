@@ -10,7 +10,7 @@ package org.openhab.binding.unifi.internal.api;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * The {@link UniFiSite} represents the data model of a UniFi site.
@@ -19,13 +19,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class UniFiSite {
 
-    @JsonProperty("_id")
+    @SerializedName("_id")
     private String id;
 
-    @JsonProperty("name")
+    @SerializedName("name")
     private String path;
 
-    @JsonProperty("desc")
+    @SerializedName("desc")
     private String name;
 
     public String getId() {

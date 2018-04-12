@@ -9,32 +9,26 @@
 package org.openhab.binding.unifi.internal.api;
 
 import org.apache.commons.lang.BooleanUtils;
-import org.openhab.binding.unifi.internal.api.json.UniFiMacDeserializer;
+import org.openhab.binding.unifi.internal.api.json.adapters.UniFiTidyLowerCaseStringDeserializer;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * The {@link UniFiClient} is the base data model for any (wired or wireless) connected to a UniFi network.
  *
  * @author Matthew Bowman - Initial contribution
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "is_wired", defaultImpl = UniFiUnknownClient.class)
-@JsonSubTypes({ @JsonSubTypes.Type(value = UniFiWiredClient.class, name = "true"),
-        @JsonSubTypes.Type(value = UniFiWirelessClient.class, name = "false") })
 public abstract class UniFiClient {
 
-    @JsonProperty("_id")
+    @SerializedName("_id")
     protected String id;
 
-    @JsonDeserialize(using = UniFiMacDeserializer.class)
+    @JsonAdapter(UniFiTidyLowerCaseStringDeserializer.class)
     protected String mac;
 
     protected String hostname;
 
-    @JsonProperty("site_id")
     protected String siteId;
 
     protected UniFiDevice device;

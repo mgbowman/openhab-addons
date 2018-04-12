@@ -9,10 +9,10 @@
 package org.openhab.binding.unifi.internal.api;
 
 import org.apache.commons.lang.StringUtils;
-import org.openhab.binding.unifi.internal.api.json.UniFiMacDeserializer;
+import org.openhab.binding.unifi.internal.api.json.adapters.UniFiTidyLowerCaseStringDeserializer;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * The {@link UniFiDevice} represents the data model of a UniFi Wireless Device
@@ -22,17 +22,16 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  */
 public class UniFiDevice {
 
-    @JsonProperty("_id")
+    @SerializedName("_id")
     private String id;
 
-    @JsonDeserialize(using = UniFiMacDeserializer.class)
+    @JsonAdapter(UniFiTidyLowerCaseStringDeserializer.class)
     private String mac;
 
     private String model;
 
     private String name;
 
-    @JsonProperty("site_id")
     private String siteId;
 
     private UniFiSite site;
