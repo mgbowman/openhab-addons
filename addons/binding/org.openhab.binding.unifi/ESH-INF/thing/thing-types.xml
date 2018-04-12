@@ -56,6 +56,8 @@
 			<channel id="uptime" typeId="uptime" />
 			<channel id="lastSeen" typeId="lastSeen" />
 		</channels>
+		
+		<representation-property>mac</representation-property>
 
 		<config-description>
 			<parameter name="mac" type="text" required="true">
