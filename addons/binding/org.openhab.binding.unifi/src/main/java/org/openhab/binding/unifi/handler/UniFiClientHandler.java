@@ -223,7 +223,7 @@ public class UniFiClientHandler extends BaseThingHandler {
                 // :lastSeen
                 case CHANNEL_LAST_SEEN:
                     // mgb: we don't check clientOnline as lastSeen is also included in the Insights data
-                    if (/* clientOnline && */ client != null && client.getLastSeen() != null) {
+                    if (client != null && client.getLastSeen() != null) {
                         state = new DateTimeType(client.getLastSeen());
                     }
                     break;
