@@ -25,18 +25,12 @@ public class UniFiClientConfig {
 
     private String site;
 
-    private String contactType;
-
     public String getMac() {
         return mac;
     }
 
     public String getSite() {
         return site;
-    }
-
-    public String getContactType() {
-        return contactType;
     }
 
     public UniFiClientConfig tidy() {
@@ -51,7 +45,7 @@ public class UniFiClientConfig {
 
     @Override
     public String toString() {
-        return "UniFiClientConfig{mac = " + mac + ", site = " + site + ", contactType = " + contactType + "}";
+        return "UniFiClientConfig{mac = " + mac + ", site = " + site + "}";
     }
 
 }
