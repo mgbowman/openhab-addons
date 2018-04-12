@@ -98,6 +98,10 @@ public class UniFiControllerHandler extends BaseBridgeHandler {
     @Override
     public void dispose() {
         cancelRefreshJob();
+        if (controller != null) {
+            controller.logout();
+            controller = null;
+        }
     }
 
     private void scheduleRefreshJob() {
