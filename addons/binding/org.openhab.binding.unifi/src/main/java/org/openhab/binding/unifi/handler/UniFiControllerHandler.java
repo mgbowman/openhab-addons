@@ -8,8 +8,10 @@
  */
 package org.openhab.binding.unifi.handler;
 
-import static org.eclipse.smarthome.core.thing.ThingStatus.*;
-import static org.eclipse.smarthome.core.thing.ThingStatusDetail.COMMUNICATION_ERROR;
+import static org.eclipse.smarthome.core.thing.ThingStatus.INITIALIZING;
+import static org.eclipse.smarthome.core.thing.ThingStatus.OFFLINE;
+import static org.eclipse.smarthome.core.thing.ThingStatus.ONLINE;
+import static org.eclipse.smarthome.core.thing.ThingStatusDetail.*;
 
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
@@ -84,7 +86,7 @@ public class UniFiControllerHandler extends BaseBridgeHandler {
             controller = new UniFiController(config);
         } catch (UniFiException e) {
             logger.error("Error configuring the UniFi Controller: {}", e.getMessage());
-            updateStatus(OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
+            updateStatus(OFFLINE, CONFIGURATION_ERROR,
                     e.getMessage() + " - Please double-check your configuration and try again.");
             controller = null;
             return;
@@ -125,7 +127,7 @@ public class UniFiControllerHandler extends BaseBridgeHandler {
                 logger.debug("Trying to establish communication with the UniFi controller");
                 if (controller.login()) {
                     status = ONLINE;
-                    statusDetail = ThingStatusDetail.NONE;
+                    statusDetail = NONE;
                     statusDescription = null;
                 }
             }

@@ -8,8 +8,9 @@
  */
 package org.openhab.binding.unifi.handler;
 
-import static org.eclipse.smarthome.core.thing.ThingStatus.*;
-import static org.eclipse.smarthome.core.thing.ThingStatusDetail.BRIDGE_OFFLINE;
+import static org.eclipse.smarthome.core.thing.ThingStatus.OFFLINE;
+import static org.eclipse.smarthome.core.thing.ThingStatus.ONLINE;
+import static org.eclipse.smarthome.core.thing.ThingStatusDetail.*;
 import static org.eclipse.smarthome.core.types.RefreshType.REFRESH;
 import static org.openhab.binding.unifi.UniFiBindingConstants.*;
 
@@ -27,7 +28,6 @@ import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.Channel;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
-import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
@@ -70,14 +70,14 @@ public class UniFiClientHandler extends BaseThingHandler {
         logger.debug("Initializing the UniFi Client Handler with config = {}", config);
 
         if (!config.isValid()) {
-            updateStatus(OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR, "Invalid MAC address.");
+            updateStatus(OFFLINE, CONFIGURATION_ERROR, "Invalid MAC address.");
             return;
         }
 
         Bridge bridge = getBridge();
 
         if (bridge == null || bridge.getHandler() == null || !(bridge.getHandler() instanceof UniFiControllerHandler)) {
-            updateStatus(OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
+            updateStatus(OFFLINE, CONFIGURATION_ERROR,
                     "You must choose a UniFi Controller for this UniFi Wireless Device.");
             return;
         }
@@ -85,7 +85,7 @@ public class UniFiClientHandler extends BaseThingHandler {
         UniFiControllerHandler controllerHandler = (UniFiControllerHandler) bridge.getHandler();
         UniFiControllerConfig controllerConfig = controllerHandler.getControllerConfig();
         if (config.getConsiderHome() <= controllerConfig.getRefresh()) {
-            updateStatus(OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
+            updateStatus(OFFLINE, CONFIGURATION_ERROR,
                     "Consider home parameter must be larger than the controller's refresh interval ("
                             + controllerConfig.getRefresh() + "s).");
             return;
