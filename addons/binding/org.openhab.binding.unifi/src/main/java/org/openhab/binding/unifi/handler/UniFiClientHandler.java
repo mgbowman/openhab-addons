@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.smarthome.core.library.types.DateTimeType;
 import org.eclipse.smarthome.core.library.types.DecimalType;
-import org.eclipse.smarthome.core.library.types.OpenClosedType;
+import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.StringType;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.Channel;
@@ -155,11 +155,7 @@ public class UniFiClientHandler extends BaseThingHandler {
             switch (channelID) {
                 // :online
                 case CHANNEL_ONLINE:
-                    if (CONTACT_TYPE_NORMALLY_OPEN.equals(config.getContactType())) {
-                        state = (clientOnline ? OpenClosedType.CLOSED : OpenClosedType.OPEN);
-                    } else {
-                        state = (clientOnline ? OpenClosedType.OPEN : OpenClosedType.CLOSED);
-                    }
+                    state = (clientOnline ? OnOffType.ON : OnOffType.OFF);
                     break;
 
                 // :site

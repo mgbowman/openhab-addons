@@ -42,11 +42,10 @@ You must define a UniFi Controller (Bridge) before defining UniFi Wireless Clien
 
 The following table describes the Thing configuration parameters:
 
-| Parameter               | Description                                             | Config   | Default | Options    |
-| ----------------------- | ------------------------------------------------------- |--------- | ------- |----------- |
-| mac                     | The MAC address of the Wireless Client                  | Required | -       | -          |
-| site<sup>1</sup>        | The site name where the Wireless Client should be found | Optional | -       | -          |
-| contactType<sup>2</sup> | The contact type for the online channel                 | Optional | `NO`    | `NO`, `NC` |
+| Parameter               | Description                                             | Config   | Default |
+| ----------------------- | ------------------------------------------------------- |--------- | ------- |
+| mac                     | The MAC address of the Wireless Client                  | Required | -       |
+| site<sup>1</sup>        | The site name where the Wireless Client should be found | Optional | -       |
 
 <sup>1</sup> The `site` configuration parameter is optional. If you leave it blank, the Wireless Client will appear `ONLINE` if found in *any* site defined on the UniFi Controller. 
 
@@ -54,27 +53,19 @@ You may use the `site` parameter as a filter if you only want the Wireless Clien
 
 Additionally, you may use friendly site names as they appear in the controller web UI.
 
-<sup>2</sup> The `contactType` parameter allows you to control the normal (default) state of the `online` channel. The normal state is when the wireless client is absent.
-
-Normally Open (NO) means the `Contact` is `OPEN` when the client is absent; it is `CLOSED` when the client is present.
-
-Normally Closed (NC) means the `Contact` is `CLOSED` when the client is absent; it is `OPEN` when the client is present. 
-
 ## Channels
 
 The Wireless Client information that is retrieved is available as these channels:
 
-| Channel ID         | Item Type | Description                                                          |
-|--------------------|-----------|--------------------------------------------------------------------- |
-| online<sup>1</sup> | Contact   | Online status of the client                                          |
-| ap                 | String    | Access point (AP) the client is connected to                         |
-| essid              | String    | Network name (ESSID) the client is connected to                      |
-| rssi               | Number    | Received signal strength indicator (RSSI) of the client              |
-| site               | String    | Site name (from the controller web UI) the client is associated with |
-| uptime             | Number    | Uptime of the wireless client (in seconds)                           |
-| lastSeen           | DateTime  | Date and Time the wireless client was last seen                      |
-
-<sup>1</sup> The `online` channel's normal (default) `Contact` state can be configured via the `contactType` parameter
+| Channel ID | Item Type | Description                                                          |
+|------------|-----------|--------------------------------------------------------------------- |
+| online     | Switch    | Online status of the client                                          |
+| ap         | String    | Access point (AP) the client is connected to                         |
+| essid      | String    | Network name (ESSID) the client is connected to                      |
+| rssi       | Number    | Received signal strength indicator (RSSI) of the client              |
+| site       | String    | Site name (from the controller web UI) the client is associated with |
+| uptime     | Number    | Uptime of the wireless client (in seconds)                           |
+| lastSeen   | DateTime  | Date and Time the wireless client was last seen                      |
 
 *Note: All channels are read-only*
 
@@ -84,7 +75,7 @@ things/unifi.things
 
 ```
 Bridge unifi:controller:home "UniFi Controller" [ host="unifi", port=8443, username="$username", password="$password", refresh=10, considerHome=180 ] {
-	Thing client matthewsPhone "Matthew's iPhone" [ mac="$mac", contactType="NO" ]
+	Thing client matthewsPhone "Matthew's iPhone" [ mac="$mac" ]
 }
 ```
 
@@ -93,7 +84,7 @@ Replace `$user`, `$password` and `$mac` accordingly. `contactType` should be `NO
 items/unifi.items
 
 ```
-Contact  MatthewsPhone           "Matthew's iPhone [MAP(unifi.map):%s]"             { channel="unifi:client:home:matthewsPhone:online" }
+Switch   MatthewsPhone           "Matthew's iPhone [MAP(unifi.map):%s]"             { channel="unifi:client:home:matthewsPhone:online" }
 String   MatthewsPhoneSite       "Matthew's iPhone: Site [%s]"                      { channel="unifi:client:home:matthewsPhone:site" }
 String   MatthewsPhoneAP         "Matthew's iPhone: AP [%s]"                        { channel="unifi:client:home:matthewsPhone:ap" }
 String   MatthewsPhoneESSID      "Matthew's iPhone: ESSID [%s]"                     { channel="unifi:client:home:matthewsPhone:essid" }
@@ -102,11 +93,11 @@ Number   MatthewsPhoneUptime     "Matthew's iPhone: Uptime [%d]"                
 DateTime MatthewsPhoneLastSeen   "Matthew's iPhone: Last Seen [%1$tH:%1$tM:%1$tS]"  { channel="unifi:client:home:matthewsPhone:lastSeen" } 
 ```
 
-transform/unifi.map (using a `NO` contact, swap if you're using `NC` contacts)
+transform/unifi.map
 
 ```
-OPEN=Away
-CLOSED=Home
+ON=Home
+OFF=Away
 ```
 
 sitemaps/unifi.sitemap

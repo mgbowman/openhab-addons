@@ -71,22 +71,12 @@
 				<label>Site</label>
 				<description>The UniFi site where the client should be found (optional)</description>
 			</parameter>
-			<parameter name="contactType" type="text" required="false">
-				<label>Contact Type</label>
-				<description>The contact type for the online channel</description>
-				<options>
-					<option value="NO">Normally Open</option>
-					<option value="NC">Normally Closed</option>
-				</options>
-				<limitToOptions>true</limitToOptions>
-				<default>NO</default>
-			</parameter>
 		</config-description>
 		
 	</thing-type>
 	
 	<channel-type id="online">
-		<item-type>Contact</item-type>
+		<item-type>Switch</item-type>
 		<label>Online</label>
 		<description>Online status of the wireless client</description>
 		<state readOnly="true"></state>
