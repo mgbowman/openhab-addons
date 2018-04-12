@@ -25,12 +25,18 @@ public class UniFiClientConfig {
 
     private String site;
 
+    private int considerHome = 180;
+
     public String getMac() {
         return mac;
     }
 
     public String getSite() {
         return site;
+    }
+
+    public int getConsiderHome() {
+        return considerHome;
     }
 
     public UniFiClientConfig tidy() {
@@ -45,7 +51,7 @@ public class UniFiClientConfig {
 
     @Override
     public String toString() {
-        return "UniFiClientConfig{mac = " + mac + ", site = " + site + "}";
+        return "UniFiClientConfig{mac = " + mac + ", site = " + site + ", considerHome = " + considerHome + "}";
     }
 
 }

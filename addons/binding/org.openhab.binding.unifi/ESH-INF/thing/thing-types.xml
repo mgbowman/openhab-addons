@@ -35,11 +35,6 @@
 				<description>The refresh interval in seconds to poll the UniFi controller</description>
 				<default>10</default>
 			</parameter>
-			<parameter name="considerHome" type="integer" required="false">
-				<label>Consider Home Interval</label>
-				<description>The interval in seconds used to consider a client as home</description>
-				<default>180</default>
-			</parameter>
 		</config-description>
 
 	</bridge-type>
@@ -71,6 +66,11 @@
 				<label>Site</label>
 				<description>The UniFi site where the client should be found (optional)</description>
 			</parameter>
+            <parameter name="considerHome" type="integer" required="false">
+                <label>Consider Home Interval</label>
+                <description>The interval in seconds used to consider a client as home</description>
+                <default>180</default>
+            </parameter>
 		</config-description>
 		
 	</thing-type>

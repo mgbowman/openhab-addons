@@ -13,6 +13,7 @@ import static org.eclipse.smarthome.core.thing.ThingStatusDetail.BRIDGE_OFFLINE;
 import static org.eclipse.smarthome.core.types.RefreshType.REFRESH;
 import static org.openhab.binding.unifi.UniFiBindingConstants.*;
 
+import java.util.Calendar;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,6 +36,7 @@ import org.eclipse.smarthome.core.types.UnDefType;
 import org.openhab.binding.unifi.UniFiBindingConstants;
 import org.openhab.binding.unifi.internal.UniFiClientConfig;
 import org.openhab.binding.unifi.internal.UniFiController;
+import org.openhab.binding.unifi.internal.UniFiControllerConfig;
 import org.openhab.binding.unifi.internal.api.UniFiDevice;
 import org.openhab.binding.unifi.internal.api.UniFiSite;
 import org.openhab.binding.unifi.internal.api.UniFiWirelessClient;
@@ -77,6 +79,15 @@ public class UniFiClientHandler extends BaseThingHandler {
         if (bridge == null || bridge.getHandler() == null || !(bridge.getHandler() instanceof UniFiControllerHandler)) {
             updateStatus(OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
                     "You must choose a UniFi Controller for this UniFi Wireless Device.");
+            return;
+        }
+
+        UniFiControllerHandler controllerHandler = (UniFiControllerHandler) bridge.getHandler();
+        UniFiControllerConfig controllerConfig = controllerHandler.getControllerConfig();
+        if (config.getConsiderHome() <= controllerConfig.getRefresh()) {
+            updateStatus(OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
+                    "Consider home parameter must be larger than the controller's refresh interval ("
+                            + controllerConfig.getRefresh() + "s).");
             return;
         }
 
@@ -134,6 +145,22 @@ public class UniFiClientHandler extends BaseThingHandler {
         return state;
     }
 
+    private boolean isWirelessClientOnline(UniFiWirelessClient client) {
+        boolean online = false;
+        if (client != null) {
+            Calendar lastSeen = client.getLastSeen();
+            if (lastSeen == null) {
+                logger.warn("Could not determine if client is online: mac = {}, lastSeen = null", client.getMac());
+            } else {
+                Calendar considerHome = (Calendar) lastSeen.clone();
+                considerHome.add(Calendar.SECOND, config.getConsiderHome());
+                Calendar now = Calendar.getInstance();
+                online = (now.compareTo(considerHome) < 0);
+            }
+        }
+        return online;
+    }
+
     private void refresh(ChannelUID channelUID) {
         // mgb: only refresh if we're ONLINE
         if (getThing().getStatus() == ONLINE) {
@@ -145,7 +172,7 @@ public class UniFiClientHandler extends BaseThingHandler {
                 logger.debug("Could not find a matching client: mac = {}, site = {}", config.getMac(),
                         config.getSite());
             }
-            boolean clientOnline = controller.isWirelessClientOnline(client);
+            boolean clientOnline = isWirelessClientOnline(client);
             UniFiDevice device = (client == null ? null : client.getDevice());
             UniFiSite site = (device == null ? null : device.getSite());
 

@@ -19,11 +19,14 @@ import org.apache.commons.lang.StringUtils;
 public class UniFiControllerConfig {
 
     private String host = "unifi";
+
     private int port = 8443;
+
     private String username;
+
     private String password;
+
     private int refresh = 10;
-    private int considerHome = 180;
 
     public String getHost() {
         return host;
@@ -45,10 +48,6 @@ public class UniFiControllerConfig {
         return refresh;
     }
 
-    public int getConsiderHome() {
-        return considerHome;
-    }
-
     public boolean isValid() {
         return StringUtils.isNotBlank(host) && StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password);
     }
@@ -56,6 +55,6 @@ public class UniFiControllerConfig {
     @Override
     public String toString() {
         return "UniFiControllerConfig{host = " + host + ", port = " + port + ", username = " + username
-                + ", password = *****, refresh = " + refresh + ", considerHome = " + considerHome + "}";
+                + ", password = *****, refresh = " + refresh + "}";
     }
 }

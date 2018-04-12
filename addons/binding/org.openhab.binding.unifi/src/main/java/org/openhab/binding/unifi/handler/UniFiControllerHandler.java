@@ -60,6 +60,10 @@ public class UniFiControllerHandler extends BaseBridgeHandler {
         return controller;
     }
 
+    protected UniFiControllerConfig getControllerConfig() {
+        return config;
+    }
+
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         // nop - read-only binding

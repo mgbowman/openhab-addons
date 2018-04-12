@@ -32,9 +32,6 @@ The following table describes the Bridge configuration parameters:
 | username                 | The username to access the UniFi Controller    | Required | -       |
 | password                 | The password to access the UniFi Controller    | Required | -       |
 | refresh                  | Refresh interval in seconds                    | Optional | 10      |
-| considerHome<sup>1</sup> | Consider home interval in seconds              | Optional | 180     |
-
-<sup>1</sup> The `considerHome` parameter allows you to control how quickly the binding marks a client as away. For example, using the default of `180` (seconds), the binding will report a client away as soon as `lastSeen` + `180` (seconds) < `now`
 
 ## Thing Configuration
 
@@ -42,16 +39,19 @@ You must define a UniFi Controller (Bridge) before defining UniFi Wireless Clien
 
 The following table describes the Thing configuration parameters:
 
-| Parameter               | Description                                             | Config   | Default |
-| ----------------------- | ------------------------------------------------------- |--------- | ------- |
-| mac                     | The MAC address of the Wireless Client                  | Required | -       |
-| site<sup>1</sup>        | The site name where the Wireless Client should be found | Optional | -       |
+| Parameter                | Description                                             | Config   | Default |
+| ------------------------ | ------------------------------------------------------- |--------- | ------- |
+| mac                      | The MAC address of the Wireless Client                  | Required | -       |
+| site<sup>1</sup>         | The site name where the Wireless Client should be found | Optional | -       |
+| considerHome<sup>2</sup> | Consider home interval in seconds                       | Optional | 180     |
 
 <sup>1</sup> The `site` configuration parameter is optional. If you leave it blank, the Wireless Client will appear `ONLINE` if found in *any* site defined on the UniFi Controller. 
 
 You may use the `site` parameter as a filter if you only want the Wireless Client to appear home if it's found in the UniFi Site defined in the `site` parameter.
 
 Additionally, you may use friendly site names as they appear in the controller web UI.
+
+<sup>2</sup> The `considerHome` parameter allows you to control how quickly the binding marks a client as away. For example, using the default of `180` (seconds), the binding will report a client away as soon as `lastSeen` + `180` (seconds) < `now`
 
 ## Channels
 
@@ -74,12 +74,12 @@ The Wireless Client information that is retrieved is available as these channels
 things/unifi.things
 
 ```
-Bridge unifi:controller:home "UniFi Controller" [ host="unifi", port=8443, username="$username", password="$password", refresh=10, considerHome=180 ] {
-	Thing client matthewsPhone "Matthew's iPhone" [ mac="$mac" ]
+Bridge unifi:controller:home "UniFi Controller" [ host="unifi", port=8443, username="$username", password="$password", refresh=10 ] {
+	Thing client matthewsPhone "Matthew's iPhone" [ mac="$mac", considerHome=180 ]
 }
 ```
 
-Replace `$user`, `$password` and `$mac` accordingly. `contactType` should be `NO` (normally open) or `NC` (normally closed)
+Replace `$user`, `$password` and `$mac` accordingly.
 
 items/unifi.items
 

@@ -20,7 +20,6 @@ import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -100,9 +99,6 @@ public class UniFiController {
 
         if (!config.isValid()) {
             throw new UniFiException("Invalid configuration");
-        } else if (config.getConsiderHome() <= config.getRefresh()) {
-            throw new UniFiException(
-                    "Invalid configuration: consider home interval must be larger than refresh interval");
         }
 
         this.config = config;
@@ -365,22 +361,6 @@ public class UniFiController {
 
         // mgb: instanceof check just for type / cast safety
         return (client instanceof UniFiWirelessClient ? (UniFiWirelessClient) client : null);
-    }
-
-    public boolean isWirelessClientOnline(UniFiWirelessClient client) {
-        boolean online = false;
-        if (client != null) {
-            Calendar lastSeen = client.getLastSeen();
-            if (lastSeen == null) {
-                logger.warn("Could not determine if client is online: mac = {}, lastSeen = null", client.getMac());
-            } else {
-                Calendar considerHome = (Calendar) lastSeen.clone();
-                considerHome.add(Calendar.SECOND, config.getConsiderHome());
-                Calendar now = Calendar.getInstance();
-                online = (now.compareTo(considerHome) < 0);
-            }
-        }
-        return online;
     }
 
     public boolean login() {
