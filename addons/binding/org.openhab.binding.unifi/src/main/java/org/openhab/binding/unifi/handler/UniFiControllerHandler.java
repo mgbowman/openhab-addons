@@ -74,7 +74,6 @@ public class UniFiControllerHandler extends BaseBridgeHandler {
 
     @Override
     public void initialize() {
-
         // mgb: called when the config changes
 
         cancelRefreshJob();
