@@ -75,7 +75,7 @@ things/unifi.things
 
 ```
 Bridge unifi:controller:home "UniFi Controller" [ host="unifi", port=8443, username="$username", password="$password", refresh=10 ] {
-	Thing client matthewsPhone "Matthew's iPhone" [ mac="$mac", considerHome=180 ]
+	Thing client matthewsPhone "Matthew's iPhone" [ mac="$mac", site="default", considerHome=180 ]
 }
 ```
 
@@ -98,6 +98,7 @@ transform/unifi.map
 ```
 ON=Home
 OFF=Away
+NULL=Unknown
 ```
 
 sitemaps/unifi.sitemap
