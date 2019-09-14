@@ -46,7 +46,8 @@ import org.slf4j.LoggerFactory;
  * The {@link UniFiControllerThingHandler} is responsible for handling commands and status
  * updates for the UniFi Controller.
  *
- * @author Matthew Bowman - Initial contribution
+ * @author Matthew Bowman    - Initial contribution
+ * @author Frederic Biermann - add method to enable / disable AP LED 
  */
 @NonNullByDefault
 public class UniFiControllerThingHandler extends BaseBridgeHandler {
@@ -135,10 +136,35 @@ public class UniFiControllerThingHandler extends BaseBridgeHandler {
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        // nop - read-only binding
-        logger.warn("Ignoring command = {} for channel = {} - the UniFi binding is read-only!", command, channelUID);
+        String channelID = channelUID.getIdWithoutGroup();
+        switch (channelID) {
+            case CHANNEL_LED_ENABLED:
+                try {
+                    handleLedEnabledCommand(channelUID, command);
+                } catch (UniFiException e) {
+                    logger.warn("Got exception on command = {} for channel = {}", command, channelUID);
+                }
+                break;
+            default:
+                logger.warn("Ignoring unsupported command = {} for channel = {}", command, channelUID);
+        }
     }
 
+    private void handleLedEnabledCommand(ChannelUID channelUID, Command command) throws UniFiException {
+        if (command instanceof OnOffType) {
+            if (controller != null) {
+                try {
+                    controller.ledEnabled(command == OnOffType.ON);
+                } catch (UniFiException e) {
+                    // mgb: nop as we're in dispose
+                }
+            }
+        } else {
+            logger.warn("Ignoring unsupported command = {} for channel = {} - valid commands types are: OnOffType",
+                    command, channelUID);
+        }
+    }
+    
     public @Nullable UniFiController getController() {
         return controller;
     }
