@@ -129,6 +129,7 @@ public class UniFiController {
         req.setPath("/api/s/default/set/setting/mgmt");
         req.setBodyParameter("led_enabled", enabled);
         executeRequest(req);
+        ledEnabled = enabled;
     }
 
     public boolean isLedEnabled() {
