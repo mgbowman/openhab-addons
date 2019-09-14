@@ -8,6 +8,10 @@
 
 		<label>UniFi Controller</label>
 		<description>A UniFi controller.</description>
+		
+		<channels>
+            		<channel id="ledEnabled" typeId="ledEnabled" />
+		</channels>
 
 		<config-description>
 			<parameter name="host" type="text" required="true">
@@ -84,6 +88,12 @@
 		</config-description>
 
 	</thing-type>
+
+	<channel-type id="ledEnabled">
+        	<item-type>Switch</item-type>
+	        <label>Led Enabled</label>
+        	<description>Status of AP LEDs</description>
+    	</channel-type>
 
 	<channel-type id="online">
 		<item-type>Switch</item-type>
