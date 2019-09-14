@@ -39,8 +39,9 @@ import com.google.gson.GsonBuilder;
  * The {@link UniFiController} is the main communication point with an external instance of the Ubiquiti Networks
  * Controller Software.
  *
- * @author Matthew Bowman - Initial contribution
- * @author Patrik Wimnell - Blocking / Unblocking client support
+ * @author Matthew Bowman    - Initial contribution
+ * @author Patrik Wimnell    - Blocking / Unblocking client support
+ * @author Frederic Biermann - Enable / Disable AP LEDs 
  */
 @NonNullByDefault
 public class UniFiController {
@@ -66,6 +67,8 @@ public class UniFiController {
     private final String password;
 
     private final Gson gson;
+    
+    protected boolean ledEnabled;
 
     public UniFiController(HttpClient httpClient, String host, int port, String username, String password) {
         this.httpClient = httpClient;
@@ -119,6 +122,17 @@ public class UniFiController {
             clientsCache = getClients();
             insightsCache = getInsights();
         }
+    }
+
+    public void ledEnabled(boolean enabled) throws UniFiException {
+        UniFiControllerRequest<Void> req = newRequest(Void.class);
+        req.setPath("/api/s/default/set/setting/mgmt");
+        req.setBodyParameter("led_enabled", enabled);
+        executeRequest(req);
+    }
+
+    public boolean isLedEnabled() {
+        return ledEnabled;
     }
 
     // Site API
