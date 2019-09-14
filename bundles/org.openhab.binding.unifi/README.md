@@ -74,6 +74,17 @@ The `considerHome` parameter allows you to control how quickly the binding marks
 
 ## Channels
 
+The Controller had these channels:
+
+| Channel ID | Item Type | Description                                                          | Permissions |
+|------------|-----------|--------------------------------------------------------------------- | ----------- |
+| ledEnabled | Switch    | Status of the AP LED                                                 | Read, Write |
+
+#### `ledEnabled`
+
+The `ledEnabled` channel allows you to enable / disable the LED on all your Access Points via the controller.
+Currently it's hardcoded on the site `default`.
+
 The Wireless Client information that is retrieved is available as these channels:
 
 | Channel ID | Item Type | Description                                                          | Permissions |
@@ -116,6 +127,9 @@ Replace `$user`, `$password` and `$cid` accordingly.
 items/unifi.items
 
 ```
+Switch   UnifiApLeds             "Unifi Accesspoint LED"                            {
+channel="unifi:controller:home:ledEnabled"}
+
 Switch   MatthewsPhone           "Matthew's iPhone [MAP(unifi.map):%s]"             { channel="unifi:wirelessClient:home:matthewsPhone:online" }
 String   MatthewsPhoneSite       "Matthew's iPhone: Site [%s]"                      { channel="unifi:wirelessClient:home:matthewsPhone:site" }
 String   MatthewsPhoneMAC        "Matthew's iPhone: MAC [%s]"                       { channel="unifi:wirelessClient:home:matthewsPhone:macAddress" }
@@ -142,6 +156,8 @@ sitemaps/unifi.sitemap
 sitemap unifi label="UniFi Binding"
 {
 	Frame {
+		Switch item=UnifiApLeds
+	
 		Text item=MatthewsPhone
 		Text item=MatthewsPhoneSite
 		Text item=MatthewsPhoneMAC
