@@ -30,6 +30,9 @@ public class UniFiBindingConstants {
     public static final ThingTypeUID THING_TYPE_WIRED_CLIENT = new ThingTypeUID(BINDING_ID, "wiredClient");
     public static final ThingTypeUID THING_TYPE_WIRELESS_CLIENT = new ThingTypeUID(BINDING_ID, "wirelessClient");
 
+    // List of controller channels
+    public static final String CHANNEL_LED_ENABLED = "ledEnabled";
+
     // List of common wired + wireless client channels
     public static final String CHANNEL_ONLINE = "online";
     public static final String CHANNEL_SITE = "site";
