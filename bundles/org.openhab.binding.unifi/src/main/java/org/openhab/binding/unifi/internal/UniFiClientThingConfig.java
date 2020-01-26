@@ -41,12 +41,6 @@ public class UniFiClientThingConfig {
         return considerHome;
     }
 
-    public UniFiClientThingConfig tidy() {
-        cid = StringUtils.lowerCase(StringUtils.strip(cid));
-        site = StringUtils.lowerCase(StringUtils.strip(site));
-        return this;
-    }
-
     public boolean isValid() {
         return StringUtils.isNotBlank(cid);
     }

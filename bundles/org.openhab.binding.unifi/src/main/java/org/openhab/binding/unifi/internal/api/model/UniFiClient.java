@@ -12,7 +12,7 @@
  */
 package org.openhab.binding.unifi.internal.api.model;
 
-import java.util.Calendar;
+import java.time.ZonedDateTime;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.openhab.binding.unifi.internal.api.UniFiException;
@@ -52,9 +52,12 @@ public abstract class UniFiClient {
     protected Integer uptime;
 
     @JsonAdapter(UniFiTimestampDeserializer.class)
-    protected Calendar lastSeen;
+    protected ZonedDateTime lastSeen;
 
     protected boolean blocked;
+
+    @SerializedName("is_guest")
+    protected boolean guest;
 
     protected UniFiClient(UniFiController controller) {
         this.controller = controller;
@@ -84,7 +87,7 @@ public abstract class UniFiClient {
         return uptime;
     }
 
-    public Calendar getLastSeen() {
+    public ZonedDateTime getLastSeen() {
         return lastSeen;
     }
 
@@ -96,6 +99,10 @@ public abstract class UniFiClient {
 
     public final Boolean isWireless() {
         return BooleanUtils.negate(isWired());
+    }
+
+    public boolean isGuest() {
+        return guest;
     }
 
     protected abstract String getDeviceMac();
@@ -111,17 +118,25 @@ public abstract class UniFiClient {
     // Functional API
 
     public void block(boolean blocked) throws UniFiException {
-        controller.block(this, blocked);
+        UniFiControllerRequest<Void> req = controller.newRequest(Void.class);
+        req.setPath("/api/s/" + getSite().getName() + "/cmd/stamgr");
+        req.setBodyParameter("cmd", blocked ? "block-sta" : "unblock-sta");
+        req.setBodyParameter("mac", mac);
+        controller.executeRequest(req);
     }
 
     public void reconnect() throws UniFiException {
-        controller.reconnect(this);
+        UniFiControllerRequest<Void> req = controller.newRequest(Void.class);
+        req.setPath("/api/s/" + getSite().getName() + "/cmd/stamgr");
+        req.setBodyParameter("cmd", "kick-sta");
+        req.setBodyParameter("mac", mac);
+        controller.executeRequest(req);
     }
 
     @Override
     public String toString() {
         return String.format(
-                "UniFiClient{mac: '%s', ip: '%s', hostname: '%s', alias: '%s', wired: %b, blocked: %b, device: %s}",
-                mac, ip, hostname, alias, isWired(), blocked, getDevice());
+                "UniFiClient{mac: '%s', ip: '%s', hostname: '%s', alias: '%s', wired: %b, device: %s, guest: %s, blocked: %b}",
+                mac, ip, hostname, alias, isWired(), getDevice(), guest, blocked);
     }
 }

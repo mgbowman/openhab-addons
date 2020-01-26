@@ -14,26 +14,45 @@ package org.openhab.binding.unifi.internal.ssl;
 
 import javax.net.ssl.X509ExtendedTrustManager;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.io.net.http.TlsTrustManagerProvider;
+import org.eclipse.smarthome.io.net.http.TrustAllTrustMananger;
 
 /**
  *
  * The {@link UniFiTrustManagerProvider} is an implementation of {@link TlsTrustManagerProvider} which provides an
- * instance of {@link UniFiTrustManagerProvider} for all servers that use a certificate with the common name equal to
- * "UniFi" (<code>CN=UniFi</code>).
+ * instance of {@link TrustAllTrustMananger} base on the peer's name.
+ *
+ * This is typically either the <code>CN</code> of the remote SSL certificate or the <code>host:port</code> combination
+ * of the remote peer.
  *
  * @author Matthew Bowman - Initial contribution
  */
-// @Component // [wip] mgb: disabled due to issues with service order loading
+@NonNullByDefault
 public class UniFiTrustManagerProvider implements TlsTrustManagerProvider {
+
+    private final String peer;
+
+    public UniFiTrustManagerProvider(String peer) {
+        this.peer = peer;
+    }
+
+    public UniFiTrustManagerProvider(String host, int port) {
+        this(host + ":" + port);
+    }
 
     @Override
     public String getHostName() {
-        return "UniFi";
+        return peer;
     }
 
     @Override
     public X509ExtendedTrustManager getTrustManager() {
-        return UniFiTrustManager.getInstance();
+        return TrustAllTrustMananger.getInstance();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("UniFiTrustManagerProvider{peer: '%s'}", peer);
     }
 }

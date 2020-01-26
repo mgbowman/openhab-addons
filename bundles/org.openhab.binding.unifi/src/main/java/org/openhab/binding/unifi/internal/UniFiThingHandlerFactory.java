@@ -12,19 +12,23 @@
  */
 package org.openhab.binding.unifi.internal;
 
-import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
+import org.eclipse.smarthome.io.net.http.ExtensibleTrustManager;
 import org.eclipse.smarthome.io.net.http.HttpClientFactory;
-import org.eclipse.smarthome.io.net.http.HttpClientInitializationException;
 import org.openhab.binding.unifi.internal.handler.UniFiClientThingHandler;
 import org.openhab.binding.unifi.internal.handler.UniFiControllerThingHandler;
+import org.openhab.binding.unifi.internal.handler.UniFiSiteThingHandler;
+import org.openhab.binding.unifi.internal.ssl.UniFiTrustManagerProvider;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link UniFiThingHandlerFactory} is responsible for creating things and thing
@@ -35,41 +39,60 @@ import org.osgi.service.component.annotations.Component;
 @Component(service = ThingHandlerFactory.class, configurationPid = "binding.unifi")
 public class UniFiThingHandlerFactory extends BaseThingHandlerFactory {
 
-    private HttpClient httpClient;
+    public static final UniFiTrustManagerProvider DEFAULT_TRUST_MANAGER_PROVIDER = new UniFiTrustManagerProvider(
+            "UniFi");
 
-    public UniFiThingHandlerFactory() {
-        // [wip] mgb: temporary work around until ssl issues are sorted
-        httpClient = new HttpClient(new SslContextFactory(true));
-        try {
-            httpClient.start();
-        } catch (Exception e) {
-            throw new HttpClientInitializationException("Could not start HttpClient", e);
-        }
-    }
+    private final Logger logger = LoggerFactory.getLogger(UniFiThingHandlerFactory.class);
+
+    private HttpClientFactory httpClientFactory;
+
+    private ExtensibleTrustManager extensibleTrustManager;
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
         return UniFiControllerThingHandler.supportsThingType(thingTypeUID)
-                || UniFiClientThingHandler.supportsThingType(thingTypeUID);
+                || UniFiClientThingHandler.supportsThingType(thingTypeUID)
+                || UniFiSiteThingHandler.supportsThingType(thingTypeUID);
     }
 
     @Override
     protected ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
         if (UniFiControllerThingHandler.supportsThingType(thingTypeUID)) {
-            return new UniFiControllerThingHandler((Bridge) thing, httpClient);
+            return new UniFiControllerThingHandler((Bridge) thing, httpClientFactory.getCommonHttpClient(),
+                    extensibleTrustManager);
         } else if (UniFiClientThingHandler.supportsThingType(thingTypeUID)) {
             return new UniFiClientThingHandler(thing);
+        } else if (UniFiSiteThingHandler.supportsThingType(thingTypeUID)) {
+            return new UniFiSiteThingHandler(thing);
         }
         return null;
     }
 
-    // @Reference // [wip] mgb: disabled due to missing common name attributes with certs
+    @Reference
     public void setHttpClientFactory(HttpClientFactory httpClientFactory) {
-        this.httpClient = httpClientFactory.getCommonHttpClient();
+        this.httpClientFactory = httpClientFactory;
     }
 
     public void unsetHttpClientFactory(HttpClientFactory httpClientFactory) {
-        // nop
+        if (this.httpClientFactory == httpClientFactory) {
+            this.httpClientFactory = null;
+        }
     }
+
+    @Reference
+    public void setExtensibleTrustManager(ExtensibleTrustManager extensibleTrustManager) {
+        this.extensibleTrustManager = extensibleTrustManager;
+        logger.debug("Registering Trust Manager Provider : {}", DEFAULT_TRUST_MANAGER_PROVIDER);
+        this.extensibleTrustManager.addTlsTrustManagerProvider(DEFAULT_TRUST_MANAGER_PROVIDER);
+    }
+
+    public void unsetExtensibleTrustManager(ExtensibleTrustManager extensibleTrustManager) {
+        if (this.extensibleTrustManager == extensibleTrustManager) {
+            logger.debug("Unregistering Trust Manager Provider : {}", DEFAULT_TRUST_MANAGER_PROVIDER);
+            this.extensibleTrustManager.removeTlsTrustManagerProvider(DEFAULT_TRUST_MANAGER_PROVIDER);
+            this.extensibleTrustManager = null;
+        }
+    }
+
 }

@@ -51,9 +51,9 @@ public abstract class UniFiCache<T> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Map<String, T> map = new HashMap<>();
+    private final Map<String, T> map = new HashMap<>();
 
-    private String[] prefixes;
+    private final String[] prefixes;
 
     protected UniFiCache(String... prefixes) {
         this.prefixes = prefixes;
@@ -62,7 +62,7 @@ public abstract class UniFiCache<T> {
     public final T get(Object id) {
         T value = null;
         for (String prefix : prefixes) {
-            String key = prefix + SEPARATOR + id;
+            String key = StringUtils.lowerCase(prefix + SEPARATOR + id);
             if (map.containsKey(key)) {
                 value = map.get(key);
                 logger.trace("Cache HIT : '{}' -> {}", key, value);
@@ -78,7 +78,7 @@ public abstract class UniFiCache<T> {
         for (String prefix : prefixes) {
             String suffix = getSuffix(value, prefix);
             if (StringUtils.isNotBlank(suffix)) {
-                String key = prefix + SEPARATOR + suffix;
+                String key = StringUtils.lowerCase(prefix + SEPARATOR + suffix);
                 map.put(key, value);
             }
         }

@@ -39,7 +39,69 @@
 
 	</bridge-type>
 
-	<!-- <thing-type id="wiredClient"> .. coming soon .. </thing-type> -->
+	<thing-type id="site">
+
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="controller" />
+		</supported-bridge-type-refs>
+		<label>UniFi Site</label>
+		<description>A site defined in a UniFi network</description>
+
+		<channels>
+			<channel id="totalClients" typeId="totalClients" />
+			<channel id="wirelessClients" typeId="wirelessClients" />
+			<channel id="wiredClients" typeId="wiredClients" />
+			<channel id="guestClients" typeId="guestClients" />
+			<channel id="led" typeId="led" />
+		</channels>
+
+		<config-description>
+			<parameter name="sid" type="text" required="true">
+				<label>Site ID</label>
+				<description>The name or description of the site</description>
+			</parameter>
+		</config-description>
+
+	</thing-type>
+
+	<thing-type id="wiredClient">
+
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="controller" />
+		</supported-bridge-type-refs>
+		<label>UniFi Wired Client</label>
+		<description>A wired client connected to a UniFi network</description>
+
+		<channels>
+			<!-- common wired + wireless client channels -->
+			<channel id="online" typeId="online" />
+			<channel id="site" typeId="site" />
+			<channel id="macAddress" typeId="macAddress" />
+			<channel id="ipAddress" typeId="ipAddress" />
+			<channel id="uptime" typeId="uptime" />
+			<channel id="lastSeen" typeId="lastSeen" />
+			<channel id="blocked" typeId="blocked" />
+		</channels>
+
+		<representation-property>cid</representation-property>
+
+		<config-description>
+			<parameter name="cid" type="text" required="true">
+				<label>Client ID</label>
+				<description>The MAC address, IP address, hostname or alias of the client</description>
+			</parameter>
+			<parameter name="site" type="text" required="false">
+				<label>Site</label>
+				<description>The site where the client should be found (optional)</description>
+			</parameter>
+			<parameter name="considerHome" type="integer" required="false">
+				<label>Consider Home Interval</label>
+				<description>The interval in seconds to consider the client as home</description>
+				<default>180</default>
+			</parameter>
+		</config-description>
+
+	</thing-type>
 
 	<thing-type id="wirelessClient">
 
@@ -47,7 +109,7 @@
 			<bridge-type-ref id="controller"/>
 		</supported-bridge-type-refs>
 		<label>UniFi Wireless Client</label>
-		<description>A wireless client connected to a UniFi wireless network</description>
+		<description>A wireless client connected to a UniFi network</description>
 
 		<channels>
 			<!-- common wired + wireless client channels -->
@@ -158,6 +220,40 @@
 		<item-type>Switch</item-type>
 		<label>Reconnect</label>
 		<description>Forces a client to reconnect</description>
+	</channel-type>
+
+	<channel-type id="totalClients">
+		<item-type>Number</item-type>
+		<label>Total Clients</label>
+		<description>The total number of clients connected to the site</description>
+		<state readOnly="true"></state>
+	</channel-type>
+
+	<channel-type id="wirelessClients">
+		<item-type>Number</item-type>
+		<label>Wireless Clients</label>
+		<description>The total number of wireless clients connected to the site</description>
+		<state readOnly="true"></state>
+	</channel-type>
+
+	<channel-type id="wiredClients">
+		<item-type>Number</item-type>
+		<label>Wired Clients</label>
+		<description>The total number of wired clients connected to the site</description>
+		<state readOnly="true"></state>
+	</channel-type>
+
+	<channel-type id="guestClients">
+		<item-type>Number</item-type>
+		<label>Guest Clients</label>
+		<description>The total number of guest clients connected to the site</description>
+		<state readOnly="true"></state>
+	</channel-type>
+	
+	<channel-type id="led">
+	   <item-type>Switch</item-type>
+	   <label>Status LED</label>
+	   <description>The status LED of devices</description>
 	</channel-type>
 
 </thing:thing-descriptions>

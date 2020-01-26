@@ -12,7 +12,10 @@
  */
 package org.openhab.binding.unifi.internal.api.model;
 
+import static org.openhab.binding.unifi.internal.api.model.UniFiSiteConfig.*;
+
 import org.apache.commons.lang.StringUtils;
+import org.openhab.binding.unifi.internal.api.UniFiException;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -25,16 +28,16 @@ public class UniFiSite {
 
     private final transient UniFiController controller;
 
-    public UniFiSite(UniFiController controller) {
-        this.controller = controller;
-    }
-
     @SerializedName("_id")
     private String id;
 
     private String name;
 
     private String desc;
+
+    public UniFiSite(UniFiController controller) {
+        this.controller = controller;
+    }
 
     public String getId() {
         return id;
@@ -46,6 +49,33 @@ public class UniFiSite {
 
     public String getDescription() {
         return desc;
+    }
+
+    public long getTotalClientCount() {
+        return controller.getClientStreamForSite(this).count();
+    }
+
+    public long getWirelessClientCount() {
+        return controller.getClientStreamForSite(this).filter(client -> client.isWireless()).count();
+    }
+
+    public long getWiredClientCount() {
+        return controller.getClientStreamForSite(this).filter(client -> client.isWired()).count();
+    }
+
+    public long getGuestClientCount() {
+        return controller.getClientStreamForSite(this).filter(client -> client.isGuest()).count();
+    }
+
+    public boolean isLedEnabled() {
+        return controller.getSiteConfig(this).getSection(SECTION_MGMT).getAsBoolean(OPTION_LED_ENABLED);
+    }
+
+    public void setLedEnabled(boolean ledEnabled) throws UniFiException {
+        UniFiControllerRequest<Void> req = controller.newRequest(Void.class);
+        req.setPath("/api/s/" + name + "/set/setting/" + SECTION_MGMT);
+        req.setBodyParameter(OPTION_LED_ENABLED, ledEnabled);
+        controller.executeRequest(req);
     }
 
     public boolean matchesName(String siteName) {

@@ -13,6 +13,9 @@
 package org.openhab.binding.unifi.internal.api.model;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -48,6 +51,8 @@ public class UniFiController {
     private final Logger logger = LoggerFactory.getLogger(UniFiController.class);
 
     private UniFiSiteCache sitesCache = new UniFiSiteCache();
+
+    private Map<UniFiSite, UniFiSiteConfig> siteConfigsCache = new HashMap<>();
 
     private UniFiDeviceCache devicesCache = new UniFiDeviceCache();
 
@@ -115,6 +120,7 @@ public class UniFiController {
     public void refresh() throws UniFiException {
         synchronized (this) {
             sitesCache = getSites();
+            siteConfigsCache = getSiteConfigs();
             devicesCache = getDevices();
             clientsCache = getClients();
             insightsCache = getInsights();
@@ -134,6 +140,14 @@ public class UniFiController {
             }
         }
         return site;
+    }
+
+    protected synchronized UniFiSiteConfig getSiteConfig(UniFiSite site) {
+        return siteConfigsCache.get(site);
+    }
+
+    protected synchronized Stream<UniFiClient> getClientStreamForSite(UniFiSite site) {
+        return clientsCache.values().stream().filter(client -> client.getSite().equals(site));
     }
 
     // Device API
@@ -170,29 +184,13 @@ public class UniFiController {
         return client;
     }
 
-    protected void block(UniFiClient client, boolean blocked) throws UniFiException {
-        UniFiControllerRequest<Void> req = newRequest(Void.class);
-        req.setPath("/api/s/" + client.getSite().getName() + "/cmd/stamgr");
-        req.setBodyParameter("cmd", blocked ? "block-sta" : "unblock-sta");
-        req.setBodyParameter("mac", client.getMac());
-        executeRequest(req);
-    }
-
-    protected void reconnect(UniFiClient client) throws UniFiException {
-        UniFiControllerRequest<Void> req = newRequest(Void.class);
-        req.setPath("/api/s/" + client.getSite().getName() + "/cmd/stamgr");
-        req.setBodyParameter("cmd", "kick-sta");
-        req.setBodyParameter("mac", client.getMac());
-        executeRequest(req);
-    }
-
     // Internal API
 
-    private <T> UniFiControllerRequest<T> newRequest(Class<T> responseType) {
-        return new UniFiControllerRequest<>(responseType, gson, httpClient, host, port);
+    protected <T> UniFiControllerRequest<T> newRequest(Class<T> responseType) {
+        return new UniFiControllerRequest<T>(responseType, gson, httpClient, host, port);
     }
 
-    private <T> @Nullable T executeRequest(UniFiControllerRequest<T> request) throws UniFiException {
+    protected <T> @Nullable T executeRequest(UniFiControllerRequest<T> request) throws UniFiException {
         T result;
         try {
             result = request.execute();
@@ -216,6 +214,19 @@ public class UniFiController {
             for (UniFiSite site : sites) {
                 cache.put(site);
             }
+        }
+        return cache;
+    }
+
+    private Map<UniFiSite, UniFiSiteConfig> getSiteConfigs() throws UniFiException {
+        Map<UniFiSite, UniFiSiteConfig> cache = new HashMap<>();
+        Collection<UniFiSite> sites = sitesCache.values();
+        for (UniFiSite site : sites) {
+            UniFiControllerRequest<UniFiSiteConfigSection[]> req = newRequest(UniFiSiteConfigSection[].class);
+            req.setPath("/api/s/" + site.getName() + "/get/setting");
+            UniFiSiteConfigSection[] sections = executeRequest(req);
+            UniFiSiteConfig config = new UniFiSiteConfig(site, sections);
+            cache.put(site, config);
         }
         return cache;
     }
@@ -301,6 +312,8 @@ public class UniFiController {
                 }
                 return value;
             }
+
         };
     }
+
 }

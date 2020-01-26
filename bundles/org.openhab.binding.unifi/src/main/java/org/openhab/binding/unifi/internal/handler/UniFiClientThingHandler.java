@@ -16,7 +16,8 @@ import static org.eclipse.smarthome.core.thing.ThingStatus.*;
 import static org.eclipse.smarthome.core.thing.ThingStatusDetail.CONFIGURATION_ERROR;
 import static org.openhab.binding.unifi.internal.UniFiBindingConstants.*;
 
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -45,7 +46,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The {@link UniFiClientThingHandler} is responsible for handling commands and status
- * updates for UniFi Wireless Devices.
+ * updates for {@link UniFiClient} instances (both wireless and wired).
  *
  * @author Matthew Bowman - Initial contribution
  * @author Patrik Wimnell - Blocking / Unblocking client support
@@ -54,7 +55,8 @@ import org.slf4j.LoggerFactory;
 public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, UniFiClientThingConfig> {
 
     public static boolean supportsThingType(ThingTypeUID thingTypeUID) {
-        return UniFiBindingConstants.THING_TYPE_WIRELESS_CLIENT.equals(thingTypeUID);
+        return UniFiBindingConstants.THING_TYPE_WIRELESS_CLIENT.equals(thingTypeUID)
+                || UniFiBindingConstants.THING_TYPE_WIRED_CLIENT.equals(thingTypeUID);
     }
 
     private final Logger logger = LoggerFactory.getLogger(UniFiClientThingHandler.class);
@@ -133,16 +135,13 @@ public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, 
 
     private synchronized boolean isClientHome(UniFiClient client) {
         boolean online = false;
-        if (client != null) {
-            Calendar lastSeen = client.getLastSeen();
-            if (lastSeen == null) {
-                logger.warn("Could not determine if client is online: cid = {}, lastSeen = null", config.getClientID());
-            } else {
-                Calendar considerHome = (Calendar) lastSeen.clone();
-                considerHome.add(Calendar.SECOND, config.getConsiderHome());
-                Calendar now = Calendar.getInstance();
-                online = (now.compareTo(considerHome) < 0);
-            }
+        ZonedDateTime lastSeen = client.getLastSeen();
+        if (lastSeen == null) {
+            logger.warn("Could not determine if client is online: cid = {}, lastSeen = null", config.getClientID());
+        } else {
+            Instant considerHomeExpiry = lastSeen.toInstant().plusSeconds(config.getConsiderHome());
+            Instant now = Instant.now();
+            online = now.isBefore(considerHomeExpiry);
         }
         return online;
     }
@@ -253,7 +252,8 @@ public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, 
 
             // :reconnect
             case CHANNEL_RECONNECT:
-                // nop - read-only channel
+                // nop - trigger channel so it's always OFF by default
+                state = OnOffType.OFF;
                 break;
         }
         return state;

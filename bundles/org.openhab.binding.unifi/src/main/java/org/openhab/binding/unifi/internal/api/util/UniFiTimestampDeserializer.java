@@ -13,7 +13,9 @@
 package org.openhab.binding.unifi.internal.api.util;
 
 import java.lang.reflect.Type;
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.TimeZone;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -25,14 +27,14 @@ import com.google.gson.JsonElement;
  *
  * @author Matthew Bowman - Initial contribution
  */
-public class UniFiTimestampDeserializer implements JsonDeserializer<Calendar> {
+public class UniFiTimestampDeserializer implements JsonDeserializer<ZonedDateTime> {
 
     @Override
-    public Calendar deserialize(JsonElement json, Type type, JsonDeserializationContext context) {
+    public ZonedDateTime deserialize(JsonElement json, Type type, JsonDeserializationContext context) {
         String text = json.getAsJsonPrimitive().getAsString();
         long millis = Long.valueOf(text) * 1000;
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(millis);
-        return cal;
+        Instant instant = Instant.ofEpochMilli(millis);
+        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(instant, TimeZone.getDefault().toZoneId());
+        return zonedDateTime;
     }
 }

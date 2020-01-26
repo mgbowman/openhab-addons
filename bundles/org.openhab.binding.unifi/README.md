@@ -5,8 +5,10 @@ This binding integrates with [Ubiquiti UniFi Networks](https://www.ubnt.com/prod
 
 ## Supported Things
 
-* `controller` - An instance of the UniFi controller software 
-* `wirelessClient` - Any wireless client connected to a UniFi wireless network
+* `controller` - An instance of the UniFi controller software managing the UniFi network
+* `site` - A site in the UniFi network
+* `wirelessClient` - A wireless client connected to the UniFi network
+* `wiredClient` - A wired client connected to the UniFi network
 
 
 ## Discovery
@@ -36,9 +38,17 @@ The following table describes the Bridge configuration parameters:
 
 ## Thing Configuration
 
-You must define a UniFi Controller (Bridge) before defining UniFi Clients (Things) for this binding to work.
+### `site`
 
-The following table describes the Thing configuration parameters:
+The following table describes the `site` configuration parameters:
+
+| Parameter    | Description                             | Config   | Default |
+| ------------ | ----------------------------------------|--------- | ------- |
+| sid          | The ID, name or description of the site | Required | -       |
+
+### `wirelessClient` & `wiredClient`
+
+The following table describes the `wirelessClient` & `wiredClient` configuration parameters:
 
 | Parameter    | Description                                                  | Config   | Default |
 | ------------ | -------------------------------------------------------------|--------- | ------- |
@@ -74,7 +84,21 @@ The `considerHome` parameter allows you to control how quickly the binding marks
 
 ## Channels
 
-The Wireless Client information that is retrieved is available as these channels:
+### `site`
+
+The `site` information that is retrieved is available as these channels:
+
+| Channel ID     | Item Type | Description                                                | Permissions |
+|----------------|-----------|----------------------------------------------------------- | ----------- |
+| totalClients   | Number    | The total number of clients connected to the site          | Read        |
+| wirelessClients| Number    | The total number of wireless clients connected to the site | Read        |
+| wiredClients   | Number    | The total number of wired clients connected to the site    | Read        |
+| guestClients   | Number    | The total number of guest clients connected to the site    | Read        |
+
+
+### `wirelessClient`
+
+The `wirelessClient` information that is retrieved is available as these channels:
 
 | Channel ID | Item Type | Description                                                          | Permissions |
 |------------|-----------|--------------------------------------------------------------------- | ----------- |
@@ -100,6 +124,20 @@ The `blocked` channel allows you to block / unblock a client via the controller.
 
 The `reconnect` channel allows you to force a client to reconnect. Sending `ON` to this channel will trigger a reconnect via the controller.
 
+### `wiredClient`
+
+The `wiredClient` information that is retrieved is available as these channels:
+
+| Channel ID | Item Type | Description                                                          | Permissions |
+|------------|-----------|--------------------------------------------------------------------- | ----------- |
+| online     | Switch    | Online status of the client                                          | Read        |
+| site       | String    | Site name (from the controller web UI) the client is associated with | Read        |
+| macAddress | String    | MAC address of the client                                            | Read        |
+| ipAddress  | String    | IP address of the client                                             | Read        |
+| uptime     | Number    | Uptime of the wireless client (in seconds)                           | Read        |
+| lastSeen   | DateTime  | Date and Time the wireless client was last seen                      | Read        |
+| blocked    | Switch    | Blocked status of the client                                         | Read, Write |
+
 
 ## Full Example
 
@@ -107,7 +145,8 @@ things/unifi.things
 
 ```
 Bridge unifi:controller:home "UniFi Controller" [ host="unifi", port=8443, username="$username", password="$password", refresh=10 ] {
-	Thing wirelessClient matthewsPhone "Matthew's iPhone" [ cid="$cid", site="default", considerHome=180 ]
+    Thing site default "Default Site" [ sid="default" ]
+    Thing wirelessClient matthewsPhone "Matthew's iPhone" [ cid="$cid", site="default", considerHome=180 ]
 }
 ```
 
@@ -116,17 +155,22 @@ Replace `$user`, `$password` and `$cid` accordingly.
 items/unifi.items
 
 ```
-Switch   MatthewsPhone           "Matthew's iPhone [MAP(unifi.map):%s]"             { channel="unifi:wirelessClient:home:matthewsPhone:online" }
-String   MatthewsPhoneSite       "Matthew's iPhone: Site [%s]"                      { channel="unifi:wirelessClient:home:matthewsPhone:site" }
-String   MatthewsPhoneMAC        "Matthew's iPhone: MAC [%s]"                       { channel="unifi:wirelessClient:home:matthewsPhone:macAddress" }
-String   MatthewsPhoneIP         "Matthew's iPhone: IP [%s]"                        { channel="unifi:wirelessClient:home:matthewsPhone:ipAddress" }
-String   MatthewsPhoneAP         "Matthew's iPhone: AP [%s]"                        { channel="unifi:wirelessClient:home:matthewsPhone:ap" }
-String   MatthewsPhoneESSID      "Matthew's iPhone: ESSID [%s]"                     { channel="unifi:wirelessClient:home:matthewsPhone:essid" }
-Number   MatthewsPhoneRSSI       "Matthew's iPhone: RSSI [%d]"                      { channel="unifi:wirelessClient:home:matthewsPhone:rssi" }
-Number   MatthewsPhoneUptime     "Matthew's iPhone: Uptime [%d]"                    { channel="unifi:wirelessClient:home:matthewsPhone:uptime" }
-DateTime MatthewsPhoneLastSeen   "Matthew's iPhone: Last Seen [%1$tH:%1$tM:%1$tS]"  { channel="unifi:wirelessClient:home:matthewsPhone:lastSeen" } 
-Switch   MatthewsPhoneBlocked    "Matthew's iPhone: Blocked"                        { channel="unifi:wirelessClient:home:matthewsPhone:blocked" }
-Switch   MatthewsPhoneReconnect  "Matthew's iPhone: Reconnect"                      { channel="unifi:wirelessClient:home:matthewsPhone:reconnect" }
+Switch   MatthewsPhone               "Matthew's iPhone [MAP(unifi.map):%s]"             { channel="unifi:wirelessClient:home:matthewsPhone:online" }
+String   MatthewsPhoneSite           "Matthew's iPhone: Site [%s]"                      { channel="unifi:wirelessClient:home:matthewsPhone:site" }
+String   MatthewsPhoneMAC            "Matthew's iPhone: MAC [%s]"                       { channel="unifi:wirelessClient:home:matthewsPhone:macAddress" }
+String   MatthewsPhoneIP             "Matthew's iPhone: IP [%s]"                        { channel="unifi:wirelessClient:home:matthewsPhone:ipAddress" }
+String   MatthewsPhoneAP             "Matthew's iPhone: AP [%s]"                        { channel="unifi:wirelessClient:home:matthewsPhone:ap" }
+String   MatthewsPhoneESSID          "Matthew's iPhone: ESSID [%s]"                     { channel="unifi:wirelessClient:home:matthewsPhone:essid" }
+Number   MatthewsPhoneRSSI           "Matthew's iPhone: RSSI [%d]"                      { channel="unifi:wirelessClient:home:matthewsPhone:rssi" }
+Number   MatthewsPhoneUptime         "Matthew's iPhone: Uptime [%d]"                    { channel="unifi:wirelessClient:home:matthewsPhone:uptime" }
+DateTime MatthewsPhoneLastSeen       "Matthew's iPhone: Last Seen [%1$tH:%1$tM:%1$tS]"  { channel="unifi:wirelessClient:home:matthewsPhone:lastSeen" } 
+Switch   MatthewsPhoneBlocked        "Matthew's iPhone: Blocked"                        { channel="unifi:wirelessClient:home:matthewsPhone:blocked" }
+Switch   MatthewsPhoneReconnect      "Matthew's iPhone: Reconnect"                      { channel="unifi:wirelessClient:home:matthewsPhone:reconnect" }
+
+Number   DefaultSiteTotalClients     "Default Site: Total Clients [%d]"                 { channel="unifi:site:home:default:totalClients" }
+Number   DefaultSiteWirelessClients  "Default Site: Wireless Clients [%d]"              { channel="unifi:site:home:default:wirelessClients" }
+Number   DefaultSiteWiredClients     "Default Site: Wired Clients [%d]"                 { channel="unifi:site:home:default:wiredClients" }
+Number   DefaultSiteGuestClients     "Default Site: Guest Clients [%d]"                 { channel="unifi:site:home:default:guestClients" }
 ```
 
 transform/unifi.map
@@ -141,18 +185,25 @@ sitemaps/unifi.sitemap
 ```
 sitemap unifi label="UniFi Binding"
 {
-	Frame {
-		Text item=MatthewsPhone
-		Text item=MatthewsPhoneSite
-		Text item=MatthewsPhoneMAC
-		Text item=MatthewsPhoneIP
-		Text item=MatthewsPhoneAP
-		Text item=MatthewsPhoneESSID
-		Text item=MatthewsPhoneRSSI
-		Text item=MatthewsPhoneUptime
-		Text item=MatthewsPhoneLastSeen
-		Switch item=MatthewsPhoneBlocked
-		Switch item=MatthewsPhoneReconnect
-	}
+    Frame {
+        Text item=MatthewsPhone
+        Text item=MatthewsPhoneSite
+        Text item=MatthewsPhoneMAC
+        Text item=MatthewsPhoneIP
+        Text item=MatthewsPhoneAP
+        Text item=MatthewsPhoneESSID
+        Text item=MatthewsPhoneRSSI
+        Text item=MatthewsPhoneUptime
+        Text item=MatthewsPhoneLastSeen
+        Switch item=MatthewsPhoneBlocked
+        Switch item=MatthewsPhoneReconnect
+    }
+    
+    Frame {
+        Text item=DefaultSiteTotalClients
+        Text item=DefaultSiteWirelessClients
+        Text item=DefaultSiteWiredClients
+        Text item=DefaultSiteGuestClients
+    }
 }
 ```
