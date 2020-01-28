@@ -249,11 +249,11 @@
 		<description>The total number of guest clients connected to the site</description>
 		<state readOnly="true"></state>
 	</channel-type>
-	
+
 	<channel-type id="led">
-	   <item-type>Switch</item-type>
-	   <label>Status LED</label>
-	   <description>The status LED of devices</description>
+		<item-type>Switch</item-type>
+		<label>Status LED</label>
+		<description>The status LED of devices</description>
 	</channel-type>
 
 </thing:thing-descriptions>

@@ -17,7 +17,6 @@ import static org.eclipse.smarthome.core.types.RefreshType.REFRESH;
 
 import java.lang.reflect.ParameterizedType;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.thing.Bridge;
@@ -122,7 +121,7 @@ public abstract class UniFiBaseThingHandler<E, C> extends BaseThingHandler {
         }
     }
 
-    protected abstract void initialize(@NonNull C config);
+    protected abstract void initialize(C config);
 
     protected abstract @Nullable E getEntity(UniFiController controller);
 

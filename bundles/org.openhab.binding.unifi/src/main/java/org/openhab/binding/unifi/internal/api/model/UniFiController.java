@@ -225,8 +225,10 @@ public class UniFiController {
             UniFiControllerRequest<UniFiSiteConfigSection[]> req = newRequest(UniFiSiteConfigSection[].class);
             req.setPath("/api/s/" + site.getName() + "/get/setting");
             UniFiSiteConfigSection[] sections = executeRequest(req);
-            UniFiSiteConfig config = new UniFiSiteConfig(site, sections);
-            cache.put(site, config);
+            if (sections != null) {
+                UniFiSiteConfig config = new UniFiSiteConfig(site, sections);
+                cache.put(site, config);
+            }
         }
         return cache;
     }
