@@ -59,6 +59,9 @@ public abstract class UniFiClient {
     @SerializedName("is_guest")
     protected boolean guest;
 
+    @SerializedName("satisfaction")
+    protected Integer experience;
+
     protected UniFiClient(UniFiController controller) {
         this.controller = controller;
     }
@@ -115,6 +118,10 @@ public abstract class UniFiClient {
         return controller.getDevice(getDeviceMac());
     }
 
+    public Integer getExperience() {
+        return experience;
+    }
+
     // Functional API
 
     public void block(boolean blocked) throws UniFiException {
@@ -136,7 +143,7 @@ public abstract class UniFiClient {
     @Override
     public String toString() {
         return String.format(
-                "UniFiClient{mac: '%s', ip: '%s', hostname: '%s', alias: '%s', wired: %b, device: %s, guest: %s, blocked: %b}",
-                mac, ip, hostname, alias, isWired(), getDevice(), guest, blocked);
+                "UniFiClient{mac: '%s', ip: '%s', hostname: '%s', alias: '%s', wired: %b, device: %s, guest: %s, blocked: %b, experience: %d}",
+                mac, ip, hostname, alias, isWired(), getDevice(), guest, blocked, experience);
     }
 }

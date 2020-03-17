@@ -136,7 +136,8 @@ public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, 
                 state = (clientHome ? UnDefType.NULL : UnDefType.UNDEF); // skip the update if the client is home
                 break;
             case CHANNEL_UPTIME:
-                // mgb: uptime should default to 0 seconds
+            case CHANNEL_EXPERIENCE:
+                // mgb: uptime + experience should default to 0
                 state = (clientHome ? UnDefType.NULL : DecimalType.ZERO); // skip the update if the client is home
                 break;
             case CHANNEL_LAST_SEEN:
@@ -217,6 +218,13 @@ public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, 
             // :blocked
             case CHANNEL_BLOCKED:
                 state = OnOffType.from(client.isBlocked());
+                break;
+
+            // :experience
+            case CHANNEL_EXPERIENCE:
+                if (clientHome && client.getExperience() != null) {
+                    state = new DecimalType(client.getExperience());
+                }
                 break;
 
             default:
