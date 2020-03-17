@@ -26,6 +26,8 @@ import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
+import org.eclipse.smarthome.core.types.State;
+import org.eclipse.smarthome.core.types.UnDefType;
 import org.openhab.binding.unifi.internal.api.UniFiException;
 import org.openhab.binding.unifi.internal.api.model.UniFiController;
 import org.slf4j.Logger;
@@ -100,6 +102,10 @@ public abstract class UniFiBaseThingHandler<E, C> extends BaseThingHandler {
                                     channelUID, e.getMessage());
                         }
                     }
+                } else {
+                    // mgb: set the default state if we're online yet cannot find the respective entity
+                    State defaultState = getDefaultState(channelUID);
+                    updateState(channelUID, defaultState);
                 }
             }
         }
@@ -119,6 +125,10 @@ public abstract class UniFiBaseThingHandler<E, C> extends BaseThingHandler {
                 }
             }
         }
+    }
+
+    protected State getDefaultState(ChannelUID channelUID) {
+        return UnDefType.UNDEF;
     }
 
     protected abstract void initialize(C config);

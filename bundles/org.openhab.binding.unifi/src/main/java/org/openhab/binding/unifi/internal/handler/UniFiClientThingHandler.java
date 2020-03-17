@@ -105,10 +105,19 @@ public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, 
         return client;
     }
 
-    private State getDefaultState(String channelID, boolean clientHome) {
+    @Override
+    protected State getDefaultState(ChannelUID channelUID) {
+        // mgb: we assume an offline client if we're interested in the 'default' state
+        return getDefaultState(channelUID, false);
+    }
+
+    private State getDefaultState(ChannelUID channelUID, boolean clientHome) {
+        String channelID = channelUID.getIdWithoutGroup();
         State state = UnDefType.NULL;
         switch (channelID) {
             case CHANNEL_ONLINE:
+                state = (clientHome ? UnDefType.NULL : OnOffType.OFF); // skip the update if the client is home
+                break;
             case CHANNEL_SITE:
             case CHANNEL_AP:
             case CHANNEL_ESSID:
@@ -120,7 +129,7 @@ public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, 
                 break;
             case CHANNEL_UPTIME:
                 // mgb: uptime should default to 0 seconds
-                state = (clientHome ? UnDefType.NULL : new DecimalType(0)); // skip the update if the client is home
+                state = (clientHome ? UnDefType.NULL : DecimalType.ZERO); // skip the update if the client is home
                 break;
             case CHANNEL_LAST_SEEN:
                 // mgb: lastSeen should keep the last state no matter what
@@ -151,8 +160,8 @@ public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, 
         boolean clientHome = isClientHome(client);
         UniFiDevice device = client.getDevice();
         UniFiSite site = (device == null ? null : device.getSite());
+        State state = getDefaultState(channelUID, clientHome);
         String channelID = channelUID.getIdWithoutGroup();
-        State state = getDefaultState(channelID, clientHome);
         switch (channelID) {
             // mgb: common wired + wireless client channels
 
