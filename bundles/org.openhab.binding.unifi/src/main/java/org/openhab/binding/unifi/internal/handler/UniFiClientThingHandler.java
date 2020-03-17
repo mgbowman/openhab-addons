@@ -95,11 +95,19 @@ public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, 
         return result;
     }
 
+    private static boolean belongsToThing(UniFiClient client, Thing thing) {
+        boolean result = false;
+        ThingTypeUID uid = thing.getThingTypeUID();
+        result = (UniFiBindingConstants.THING_TYPE_WIRELESS_CLIENT.equals(uid) && client.isWireless())
+                || (UniFiBindingConstants.THING_TYPE_WIRED_CLIENT.equals(uid) && client.isWired());
+        return result;
+    }
+
     @Override
     protected synchronized @Nullable UniFiClient getEntity(UniFiController controller) {
         UniFiClient client = controller.getClient(config.getClientID());
         // mgb: short circuit
-        if (client == null || !belongsToSite(client, config.getSite())) {
+        if (client == null || !belongsToThing(client, thing) || !belongsToSite(client, config.getSite())) {
             return null;
         }
         return client;
