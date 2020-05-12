@@ -1,10 +1,14 @@
 /**
- * Copyright (c) 2010-2018 by the respective copyright holders.
+ * Copyright (c) 2010-2020 Contributors to the openHAB project
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 package org.openhab.binding.unifi.internal;
 
@@ -19,9 +23,9 @@ import org.openhab.binding.unifi.internal.handler.UniFiClientThingHandler;
  */
 public class UniFiClientThingConfig {
 
-    private String cid;
+    private String cid = "";
 
-    private String site;
+    private String site = "";
 
     private int considerHome = 180;
 
@@ -37,12 +41,6 @@ public class UniFiClientThingConfig {
         return considerHome;
     }
 
-    public UniFiClientThingConfig tidy() {
-        cid = StringUtils.lowerCase(StringUtils.strip(cid));
-        site = StringUtils.lowerCase(StringUtils.strip(site));
-        return this;
-    }
-
     public boolean isValid() {
         return StringUtils.isNotBlank(cid);
     }
@@ -51,5 +49,4 @@ public class UniFiClientThingConfig {
     public String toString() {
         return String.format("UniFiClientConfig{cid: '%s', site: '%s', considerHome: %d}", cid, site, considerHome);
     }
-
 }

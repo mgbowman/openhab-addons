@@ -13,23 +13,23 @@
 package org.openhab.binding.unifi.internal.api;
 
 /**
- * The {@link UniFiSSLException} signals a failure establishing an SSL connection with the controller.
+ * The {@link UniFiNotAuthorizedException} signals the controller denied a request due to non-admin credentials.
  *
  * @author Matthew Bowman - Initial contribution
  */
-public class UniFiSSLException extends UniFiException {
+public class UniFiNotAuthorizedException extends UniFiException {
 
-    private static final long serialVersionUID = 4688857482270932413L;
+    private static final long serialVersionUID = 1379973398415636322L;
 
-    public UniFiSSLException(String message) {
+    public UniFiNotAuthorizedException(String message) {
         super(message);
     }
 
-    public UniFiSSLException(String message, Throwable cause) {
+    public UniFiNotAuthorizedException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public UniFiSSLException(Throwable cause) {
+    public UniFiNotAuthorizedException(Throwable cause) {
         super(cause);
     }
 }

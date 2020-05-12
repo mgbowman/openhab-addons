@@ -1,10 +1,14 @@
 /**
- * Copyright (c) 2010-2018 by the respective copyright holders.
+ * Copyright (c) 2010-2020 Contributors to the openHAB project
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 package org.openhab.binding.unifi.internal;
 
@@ -15,6 +19,7 @@ import org.eclipse.smarthome.core.thing.ThingTypeUID;
  * used across the UniFi binding.
  *
  * @author Matthew Bowman - Initial contribution
+ * @author Patrik Wimnell - Blocking / Unblocking client support
  */
 public class UniFiBindingConstants {
 
@@ -22,8 +27,17 @@ public class UniFiBindingConstants {
 
     // List of all Thing Types
     public static final ThingTypeUID THING_TYPE_CONTROLLER = new ThingTypeUID(BINDING_ID, "controller");
-    public static final ThingTypeUID THING_TYPE_WIRED_CLIENT = new ThingTypeUID(BINDING_ID, "wiredClient");
+    public static final ThingTypeUID THING_TYPE_SITE = new ThingTypeUID(BINDING_ID, "site");
     public static final ThingTypeUID THING_TYPE_WIRELESS_CLIENT = new ThingTypeUID(BINDING_ID, "wirelessClient");
+    public static final ThingTypeUID THING_TYPE_WIRED_CLIENT = new ThingTypeUID(BINDING_ID, "wiredClient");
+
+    // List of site channels
+    public static final String CHANNEL_TOTAL_CLIENTS = "totalClients";
+    public static final String CHANNEL_WIRELESS_CLIENTS = "wirelessClients";
+    public static final String CHANNEL_WIRED_CLIENTS = "wiredClients";
+    public static final String CHANNEL_GUEST_CLIENTS = "guestClients";
+
+    public static final String CHANNEL_LED = "led";
 
     // List of common wired + wireless client channels
     public static final String CHANNEL_ONLINE = "online";
@@ -32,6 +46,9 @@ public class UniFiBindingConstants {
     public static final String CHANNEL_IP_ADDRESS = "ipAddress";
     public static final String CHANNEL_UPTIME = "uptime";
     public static final String CHANNEL_LAST_SEEN = "lastSeen";
+    public static final String CHANNEL_BLOCKED = "blocked";
+    public static final String CHANNEL_RECONNECT = "reconnect";
+    public static final String CHANNEL_EXPERIENCE = "experience";
 
     // List of additional wired client channels
     // ..coming soon..
@@ -48,5 +65,4 @@ public class UniFiBindingConstants {
     public static final String PARAMETER_PASSWORD = "password";
     public static final String PARAMETER_SITE = "site";
     public static final String PARAMETER_CID = "cid";
-
 }

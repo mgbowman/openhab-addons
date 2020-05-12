@@ -1,16 +1,21 @@
 /**
- * Copyright (c) 2010-2018 by the respective copyright holders.
+ * Copyright (c) 2010-2020 Contributors to the openHAB project
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 package org.openhab.binding.unifi.internal.api.model;
 
-import java.util.Calendar;
+import java.time.ZonedDateTime;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.openhab.binding.unifi.internal.api.UniFiException;
 import org.openhab.binding.unifi.internal.api.util.UniFiTidyLowerCaseStringDeserializer;
 import org.openhab.binding.unifi.internal.api.util.UniFiTimestampDeserializer;
 
@@ -21,8 +26,11 @@ import com.google.gson.annotations.SerializedName;
  * The {@link UniFiClient} is the base data model for any (wired or wireless) connected to a UniFi network.
  *
  * @author Matthew Bowman - Initial contribution
+ * @author Patrik Wimnell - Blocking / Unblocking client support
  */
 public abstract class UniFiClient {
+
+    protected final transient UniFiController controller;
 
     @SerializedName("_id")
     protected String id;
@@ -44,16 +52,22 @@ public abstract class UniFiClient {
     protected Integer uptime;
 
     @JsonAdapter(UniFiTimestampDeserializer.class)
-    protected Calendar lastSeen;
+    protected ZonedDateTime lastSeen;
 
-    protected UniFiDevice device;
+    protected boolean blocked;
+
+    @SerializedName("is_guest")
+    protected boolean guest;
+
+    @SerializedName("satisfaction")
+    protected Integer experience;
+
+    protected UniFiClient(UniFiController controller) {
+        this.controller = controller;
+    }
 
     public String getId() {
         return id;
-    }
-
-    public String getSiteId() {
-        return siteId;
     }
 
     public String getMac() {
@@ -76,16 +90,12 @@ public abstract class UniFiClient {
         return uptime;
     }
 
-    public Calendar getLastSeen() {
+    public ZonedDateTime getLastSeen() {
         return lastSeen;
     }
 
-    public UniFiDevice getDevice() {
-        return device;
-    }
-
-    public void setDevice(UniFiDevice device) {
-        this.device = device;
+    public boolean isBlocked() {
+        return blocked;
     }
 
     public abstract Boolean isWired();
@@ -94,12 +104,46 @@ public abstract class UniFiClient {
         return BooleanUtils.negate(isWired());
     }
 
-    public abstract String getDeviceMac();
+    public boolean isGuest() {
+        return guest;
+    }
+
+    protected abstract String getDeviceMac();
+
+    public UniFiSite getSite() {
+        return controller.getSite(siteId);
+    }
+
+    public UniFiDevice getDevice() {
+        return controller.getDevice(getDeviceMac());
+    }
+
+    public Integer getExperience() {
+        return experience;
+    }
+
+    // Functional API
+
+    public void block(boolean blocked) throws UniFiException {
+        UniFiControllerRequest<Void> req = controller.newRequest(Void.class);
+        req.setPath("/api/s/" + getSite().getName() + "/cmd/stamgr");
+        req.setBodyParameter("cmd", blocked ? "block-sta" : "unblock-sta");
+        req.setBodyParameter("mac", mac);
+        controller.executeRequest(req);
+    }
+
+    public void reconnect() throws UniFiException {
+        UniFiControllerRequest<Void> req = controller.newRequest(Void.class);
+        req.setPath("/api/s/" + getSite().getName() + "/cmd/stamgr");
+        req.setBodyParameter("cmd", "kick-sta");
+        req.setBodyParameter("mac", mac);
+        controller.executeRequest(req);
+    }
 
     @Override
     public String toString() {
-        return String.format("UniFiClient{mac: '%s', ip: '%s', hostname: '%s', alias: '%s', wired: %b, device: %s}",
-                mac, ip, hostname, alias, isWired(), device);
+        return String.format(
+                "UniFiClient{mac: '%s', ip: '%s', hostname: '%s', alias: '%s', wired: %b, device: %s, guest: %s, blocked: %b, experience: %d}",
+                mac, ip, hostname, alias, isWired(), getDevice(), guest, blocked, experience);
     }
-
 }

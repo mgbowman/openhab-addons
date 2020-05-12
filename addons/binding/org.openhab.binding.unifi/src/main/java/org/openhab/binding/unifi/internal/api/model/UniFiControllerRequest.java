@@ -1,16 +1,21 @@
 /**
- * Copyright (c) 2010-2018 by the respective copyright holders.
+ * Copyright (c) 2010-2020 Contributors to the openHAB project
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.unifi.internal.api;
+package org.openhab.binding.unifi.internal.api.model;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.net.ConnectException;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,16 +38,20 @@ import org.eclipse.jetty.http.HttpScheme;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.http.HttpURI;
 import org.eclipse.jetty.http.MimeTypes;
+import org.openhab.binding.unifi.internal.api.UniFiCommunicationException;
+import org.openhab.binding.unifi.internal.api.UniFiException;
+import org.openhab.binding.unifi.internal.api.UniFiExpiredSessionException;
+import org.openhab.binding.unifi.internal.api.UniFiInvalidCredentialsException;
+import org.openhab.binding.unifi.internal.api.UniFiInvalidHostException;
+import org.openhab.binding.unifi.internal.api.UniFiNotAuthorizedException;
+import org.openhab.binding.unifi.internal.api.UniFiSSLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSyntaxException;
 
 /**
  * The {@link UniFiControllerRequest} encapsulates a request sent by the {@link UniFiController}.
@@ -54,7 +63,7 @@ import com.google.gson.JsonSyntaxException;
 @NonNullByDefault
 public class UniFiControllerRequest<T> {
 
-    private static final String CONTENT_TYPE_APPLICATION_JSON = MimeTypes.Type.APPLICATION_JSON.asString();
+    private static final String CONTENT_TYPE_APPLICATION_JSON_UTF_8 = MimeTypes.Type.APPLICATION_JSON_UTF_8.asString();
 
     private static final long TIMEOUT_SECONDS = 5;
 
@@ -130,6 +139,8 @@ public class UniFiControllerRequest<T> {
                 throw new UniFiInvalidCredentialsException("Invalid Credentials");
             case HttpStatus.UNAUTHORIZED_401:
                 throw new UniFiExpiredSessionException("Expired Credentials");
+            case HttpStatus.FORBIDDEN_403:
+                throw new UniFiNotAuthorizedException("Unauthorized Access");
             default:
                 throw new UniFiException("Unknown HTTP status code " + status + " returned by the controller");
         }
@@ -160,7 +171,7 @@ public class UniFiControllerRequest<T> {
                     && ((HttpResponseException) cause).getResponse() instanceof ContentResponse) {
                 // the UniFi controller violates the HTTP protocol
                 // - it returns 401 UNAUTHORIZED without the WWW-Authenticate response header
-                // - this causes an ExceptionException to be thrown
+                // - this causes an ExecutionException to be thrown
                 // - we unwrap the response from the exception for proper handling of the 401 status code
                 response = (ContentResponse) ((HttpResponseException) cause).getResponse();
             } else {
@@ -180,27 +191,11 @@ public class UniFiControllerRequest<T> {
             request.param(entry.getKey(), entry.getValue());
         }
         if (!bodyParameters.isEmpty()) {
-            String jsonBody = getRequestBodyAsJson();
-            ContentProvider content = new StringContentProvider(CONTENT_TYPE_APPLICATION_JSON, jsonBody,
-                    StandardCharsets.UTF_8);
+            String jsonBody = gson.toJson(bodyParameters);
+            ContentProvider content = new StringContentProvider(CONTENT_TYPE_APPLICATION_JSON_UTF_8, jsonBody, UTF_8);
             request = request.content(content);
         }
         return request;
-    }
-
-    private String getRequestBodyAsJson() {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = new JsonObject();
-        JsonElement jsonElement = null;
-        for (Entry<String, String> entry : bodyParameters.entrySet()) {
-            try {
-                jsonElement = jsonParser.parse(entry.getValue());
-            } catch (JsonSyntaxException e) {
-                jsonElement = new JsonPrimitive(entry.getValue());
-            }
-            jsonObject.add(entry.getKey(), jsonElement);
-        }
-        return jsonObject.toString();
     }
 
     private static String prettyPrintJson(String content) {
@@ -209,5 +204,4 @@ public class UniFiControllerRequest<T> {
         Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
         return prettyGson.toJson(json);
     }
-
 }
