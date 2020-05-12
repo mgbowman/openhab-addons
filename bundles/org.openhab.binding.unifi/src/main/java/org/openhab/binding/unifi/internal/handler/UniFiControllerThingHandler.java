@@ -31,7 +31,6 @@ import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.thing.binding.builder.ThingStatusInfoBuilder;
 import org.eclipse.smarthome.core.types.Command;
-import org.eclipse.smarthome.io.net.http.ExtensibleTrustManager;
 import org.eclipse.smarthome.io.net.http.TlsTrustManagerProvider;
 import org.openhab.binding.unifi.internal.UniFiBindingConstants;
 import org.openhab.binding.unifi.internal.UniFiControllerThingConfig;
@@ -41,7 +40,6 @@ import org.openhab.binding.unifi.internal.api.UniFiInvalidCredentialsException;
 import org.openhab.binding.unifi.internal.api.UniFiInvalidHostException;
 import org.openhab.binding.unifi.internal.api.UniFiSSLException;
 import org.openhab.binding.unifi.internal.api.model.UniFiController;
-import org.openhab.binding.unifi.internal.ssl.UniFiTrustManagerProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,16 +74,21 @@ public class UniFiControllerThingHandler extends BaseBridgeHandler {
 
     private final HttpClient httpClient;
 
-    private final ExtensibleTrustManager extensibleTrustManager;
+    // private final ExtensibleTrustManager extensibleTrustManager;
 
     private @Nullable TlsTrustManagerProvider trustManagerProvider;
 
-    public UniFiControllerThingHandler(Bridge bridge, HttpClient httpClient,
-            ExtensibleTrustManager extensibleTrustManager) {
+    public UniFiControllerThingHandler(Bridge bridge, HttpClient httpClient) {
         super(bridge);
         this.httpClient = httpClient;
-        this.extensibleTrustManager = extensibleTrustManager;
     }
+
+    // public UniFiControllerThingHandler(Bridge bridge, HttpClient httpClient,
+    // ExtensibleTrustManager extensibleTrustManager) {
+    // super(bridge);
+    // this.httpClient = httpClient;
+    // this.extensibleTrustManager = extensibleTrustManager;
+    // }
 
     // Public API
 
@@ -97,7 +100,7 @@ public class UniFiControllerThingHandler extends BaseBridgeHandler {
         logger.debug("Initializing the UniFi Controller Handler with config = {}", config);
         try {
             // mgb: have to register the TMP _before_ the connection to the controller can be initiated
-            registerTrustManagerProvider();
+            // registerTrustManagerProvider();
             controller = new UniFiController(httpClient, config.getHost(), config.getPort(), config.getUsername(),
                     config.getPassword());
             controller.start();
@@ -122,7 +125,7 @@ public class UniFiControllerThingHandler extends BaseBridgeHandler {
             scheduleRefreshJob();
         } else if (status == OFFLINE && statusDetail == CONFIGURATION_ERROR) {
             cancelRefreshJob();
-            unregisterTrustManagerProvider();
+            // unregisterTrustManagerProvider();
         }
         // mgb: update the status only if it's changed
         ThingStatusInfo statusInfo = ThingStatusInfoBuilder.create(status, statusDetail).withDescription(description)
@@ -181,25 +184,25 @@ public class UniFiControllerThingHandler extends BaseBridgeHandler {
         }
     }
 
-    private void registerTrustManagerProvider() {
-        synchronized (this) {
-            if (trustManagerProvider == null) {
-                trustManagerProvider = new UniFiTrustManagerProvider(config.getHost(), config.getPort());
-                logger.debug("Registering Trust Manager Provider : {}", trustManagerProvider);
-                extensibleTrustManager.addTlsTrustManagerProvider(trustManagerProvider);
-            }
-        }
-    }
-
-    private void unregisterTrustManagerProvider() {
-        synchronized (this) {
-            if (trustManagerProvider != null) {
-                logger.debug("Unregistering Trust Manager Provider : {}", trustManagerProvider);
-                extensibleTrustManager.removeTlsTrustManagerProvider(trustManagerProvider);
-                trustManagerProvider = null;
-            }
-        }
-    }
+    // private void registerTrustManagerProvider() {
+    // synchronized (this) {
+    // if (trustManagerProvider == null) {
+    // trustManagerProvider = new UniFiTrustManagerProvider(config.getHost(), config.getPort());
+    // logger.debug("Registering Trust Manager Provider : {}", trustManagerProvider);
+    // extensibleTrustManager.addTlsTrustManagerProvider(trustManagerProvider);
+    // }
+    // }
+    // }
+    //
+    // private void unregisterTrustManagerProvider() {
+    // synchronized (this) {
+    // if (trustManagerProvider != null) {
+    // logger.debug("Unregistering Trust Manager Provider : {}", trustManagerProvider);
+    // extensibleTrustManager.removeTlsTrustManagerProvider(trustManagerProvider);
+    // trustManagerProvider = null;
+    // }
+    // }
+    // }
 
     private void run() {
         try {
