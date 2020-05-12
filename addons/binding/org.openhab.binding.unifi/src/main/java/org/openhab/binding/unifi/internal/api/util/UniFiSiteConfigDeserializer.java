@@ -14,6 +14,7 @@ package org.openhab.binding.unifi.internal.api.util;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,7 +49,13 @@ public class UniFiSiteConfigDeserializer implements JsonDeserializer<UniFiSiteCo
         Map<String, Object> config = new HashMap<>();
 
         JsonObject jsonObject = json.getAsJsonObject();
-        Set<String> keys = jsonObject.keySet();
+
+        // Set<String> keys = jsonObject.keySet(); // since 2.8 - need 2.7 for OH 2.4 compat
+        Set<String> keys = new HashSet<>();
+        for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+            keys.add(entry.getKey());
+        }
+
         for (String key : keys) {
 
             // mgb: skip redundant keys
