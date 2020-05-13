@@ -35,6 +35,7 @@ import org.eclipse.smarthome.core.types.UnDefType;
 import org.openhab.binding.unifi.internal.UniFiBindingConstants;
 import org.openhab.binding.unifi.internal.UniFiClientThingConfig;
 import org.openhab.binding.unifi.internal.api.UniFiException;
+import org.openhab.binding.unifi.internal.api.cache.UniFiClientCache;
 import org.openhab.binding.unifi.internal.api.model.UniFiClient;
 import org.openhab.binding.unifi.internal.api.model.UniFiController;
 import org.openhab.binding.unifi.internal.api.model.UniFiDevice;
@@ -43,6 +44,7 @@ import org.openhab.binding.unifi.internal.api.model.UniFiWiredClient;
 import org.openhab.binding.unifi.internal.api.model.UniFiWirelessClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.extra.Seconds;
 
 /**
  * The {@link UniFiClientThingHandler} is responsible for handling commands and status
@@ -62,6 +64,8 @@ public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, 
     private final Logger logger = LoggerFactory.getLogger(UniFiClientThingHandler.class);
 
     private UniFiClientThingConfig config = new UniFiClientThingConfig();
+
+    private UniFiClientCache clientCache = new UniFiClientCache();
 
     public UniFiClientThingHandler(Thing thing) {
         super(thing);
@@ -107,8 +111,17 @@ public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, 
     protected synchronized @Nullable UniFiClient getEntity(UniFiController controller) {
         UniFiClient client = controller.getClient(config.getClientID());
         // mgb: short circuit
-        if (client == null || !belongsToThing(client, thing) || !belongsToSite(client, config.getSite())) {
+        if (client == null || !belongsToSite(client, config.getSite())) {
             return null;
+        }
+        if (belongsToThing(client, thing)) {
+            clientCache.put(client);
+        } else {
+            // mgb: we got a WIRED client for a WIRELESS thing (or vice versa)
+            client = clientCache.get(config.getClientID());
+            if (client != null) {
+                logger.warn("Returning cached client {} - controller returned incorrect type", config.getClientID());
+            }
         }
         return client;
     }
@@ -151,17 +164,20 @@ public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, 
         return state;
     }
 
-    private synchronized boolean isClientHome(UniFiClient client) {
-        boolean online = false;
+    private synchronized int getConsiderHomeSecondsRemaining(UniFiClient client) {
+        int remaining = 0;
         ZonedDateTime lastSeen = client.getLastSeen();
         if (lastSeen == null) {
-            logger.warn("Could not determine if client is online: cid = {}, lastSeen = null", config.getClientID());
-        } else {
-            Instant considerHomeExpiry = lastSeen.toInstant().plusSeconds(config.getConsiderHome());
-            Instant now = Instant.now();
-            online = now.isBefore(considerHomeExpiry);
+            logger.warn("Could not determine if client is home: cid = {}, lastSeen = null", config.getClientID());
+            return remaining;
         }
-        return online;
+        Instant considerHomeExpiry = lastSeen.toInstant().plusSeconds(config.getConsiderHome());
+        remaining = Seconds.between(Instant.now(), considerHomeExpiry).getAmount();
+        return Math.max(0, remaining);
+    }
+
+    private synchronized boolean isClientHome(UniFiClient client) {
+        return getConsiderHomeSecondsRemaining(client) > 0;
     }
 
     @Override
@@ -177,6 +193,8 @@ public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, 
             // :online
             case CHANNEL_ONLINE:
                 state = OnOffType.from(clientHome);
+                // mgb: only log on online channel refreshes
+                logClientState(client, clientHome, state);
                 break;
 
             // :site
@@ -242,6 +260,18 @@ public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, 
         // mgb: only non null states get updates
         if (state != UnDefType.NULL) {
             updateState(channelID, state);
+        }
+    }
+
+    private void logClientState(UniFiClient client, boolean clientHome, State clientState) {
+        if (logger.isDebugEnabled()) {
+            String status = "AWAY";
+            if (clientHome) {
+                int remaining = getConsiderHomeSecondsRemaining(client);
+                status = "HOME (" + (client.isConnected() ? "connected" : "disconnected") + "; expires in " + remaining
+                        + "s)";
+            }
+            logger.debug("Client {} is {} => {}", config.getClientID(), status, clientState);
         }
     }
 

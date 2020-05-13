@@ -173,8 +173,16 @@ public class UniFiController {
             synchronized (this) {
                 // mgb: first check active clients and fallback to insights if not found
                 client = clientsCache.get(id);
+                if (client != null) {
+                    client.setConnected(true);
+                    logger.debug("Client {} is CONNECTED - {}", id, client.isWired() ? "wired" : "wireless");
+                }
                 if (client == null) {
                     client = insightsCache.get(id);
+                    if (client != null) {
+                        client.setConnected(false);
+                        logger.debug("Client {} is DISCONNECTED - {}", id, client.isWired() ? "wired" : "wireless");
+                    }
                 }
             }
             if (client == null) {
@@ -210,7 +218,7 @@ public class UniFiController {
         UniFiSite[] sites = executeRequest(req);
         UniFiSiteCache cache = new UniFiSiteCache();
         if (sites != null) {
-            logger.debug("Found {} UniFi Site(s): {}", sites.length, lazyFormatAsList(sites));
+            logger.trace("Found {} UniFi Site(s): {}", sites.length, lazyFormatAsList(sites));
             for (UniFiSite site : sites) {
                 cache.put(site);
             }
@@ -248,7 +256,7 @@ public class UniFiController {
         UniFiDevice[] devices = executeRequest(req);
         UniFiDeviceCache cache = new UniFiDeviceCache();
         if (devices != null) {
-            logger.debug("Found {} UniFi Device(s): {}", devices.length, lazyFormatAsList(devices));
+            logger.trace("Found {} UniFi Device(s): {}", devices.length, lazyFormatAsList(devices));
             for (UniFiDevice device : devices) {
                 cache.put(device);
             }
@@ -271,7 +279,7 @@ public class UniFiController {
         UniFiClient[] clients = executeRequest(req);
         UniFiClientCache cache = new UniFiClientCache();
         if (clients != null) {
-            logger.debug("Found {} UniFi Client(s): {}", clients.length, lazyFormatAsList(clients));
+            logger.trace("Found {} UniFi Client(s): {}", clients.length, lazyFormatAsList(clients));
             for (UniFiClient client : clients) {
                 cache.put(client);
             }
@@ -295,7 +303,7 @@ public class UniFiController {
         UniFiClient[] clients = executeRequest(req);
         UniFiClientCache cache = new UniFiClientCache();
         if (clients != null) {
-            logger.debug("Found {} UniFi Insights(s): {}", clients.length, lazyFormatAsList(clients));
+            logger.trace("Found {} UniFi Insights(s): {}", clients.length, lazyFormatAsList(clients));
             for (UniFiClient client : clients) {
                 cache.put(client);
             }

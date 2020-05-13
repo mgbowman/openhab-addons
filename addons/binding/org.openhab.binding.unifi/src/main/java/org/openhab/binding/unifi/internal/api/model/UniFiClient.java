@@ -62,6 +62,8 @@ public abstract class UniFiClient {
     @SerializedName("satisfaction")
     protected Integer experience;
 
+    protected transient boolean connected;
+
     protected UniFiClient(UniFiController controller) {
         this.controller = controller;
     }
@@ -120,6 +122,14 @@ public abstract class UniFiClient {
 
     public Integer getExperience() {
         return experience;
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
     }
 
     // Functional API

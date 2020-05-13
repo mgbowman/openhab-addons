@@ -223,7 +223,7 @@ public class UniFiControllerThingHandler extends BaseBridgeHandler {
     @SuppressWarnings({ "null", "rawtypes" })
     private void refresh() throws UniFiException {
         if (controller != null) {
-            logger.debug("Refreshing the UniFi Controller {}", getThing().getUID());
+            logger.debug("Refreshing {}", getThing().getUID());
             controller.refresh();
             // mgb: then refresh all the client things
             getThing().getThings().forEach((thing) -> {
