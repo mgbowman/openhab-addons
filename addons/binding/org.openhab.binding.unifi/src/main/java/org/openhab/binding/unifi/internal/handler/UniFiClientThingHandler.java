@@ -44,7 +44,6 @@ import org.openhab.binding.unifi.internal.api.model.UniFiWiredClient;
 import org.openhab.binding.unifi.internal.api.model.UniFiWirelessClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.threeten.extra.Seconds;
 
 /**
  * The {@link UniFiClientThingHandler} is responsible for handling commands and status
@@ -164,15 +163,15 @@ public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, 
         return state;
     }
 
-    private synchronized int getConsiderHomeSecondsRemaining(UniFiClient client) {
-        int remaining = 0;
+    private synchronized long getConsiderHomeSecondsRemaining(UniFiClient client) {
+        long remaining = 0;
         ZonedDateTime lastSeen = client.getLastSeen();
         if (lastSeen == null) {
             logger.warn("Could not determine if client is home: cid = {}, lastSeen = null", config.getClientID());
             return remaining;
         }
         Instant considerHomeExpiry = lastSeen.toInstant().plusSeconds(config.getConsiderHome());
-        remaining = Seconds.between(Instant.now(), considerHomeExpiry).getAmount();
+        remaining = considerHomeExpiry.getEpochSecond() - Instant.now().getEpochSecond();
         return Math.max(0, remaining);
     }
 
@@ -267,7 +266,7 @@ public class UniFiClientThingHandler extends UniFiBaseThingHandler<UniFiClient, 
         if (logger.isDebugEnabled()) {
             String status = "AWAY";
             if (clientHome) {
-                int remaining = getConsiderHomeSecondsRemaining(client);
+                long remaining = getConsiderHomeSecondsRemaining(client);
                 status = "HOME (" + (client.isConnected() ? "connected" : "disconnected") + "; expires in " + remaining
                         + "s)";
             }
